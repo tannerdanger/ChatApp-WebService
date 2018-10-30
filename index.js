@@ -7,14 +7,12 @@ const app = express();
 // //This allows parsing of the body of POST requests, that are encoded in JSON
 // app.use(bodyParser.json());
 
-// app.use('/phish', require('./routes/phish.js'));
+
 // app.use('/params', require('./routes/params.js'));
 app.use('/login', require('./routes/login.js'));
 app.use('/weather', require('./routes/weather.js'));
- app.use('/register', require('./routes/register.js'));
-// app.use('/hello', require('./routes/hello.js'));
-// app.use('/wait', require('./routes/wait.js'));
-// app.use('/demosql', require('./routes/demosql.js'));
+app.use('/register', require('./routes/register.js'));
+
 
 /*
  * Return HTML for the / end point. 
@@ -30,7 +28,7 @@ app.get("/", (req, res) => {
     }
     res.end(); //end the response
 });
-
+//
 
 /* 
 * Heroku will assign a port you can use via the 'PORT' environment variable
