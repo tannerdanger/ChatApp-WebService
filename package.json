@@ -1,0 +1,26 @@
+{
+  "name": "450_chat_app_srv",
+  "version": "1.0.0",
+  "description": "TCSS 450 Group 6 project web server",
+  "main": "index.js",
+  "scripts": {
+    "test": "index.js"
+  },
+  "keywords": [
+    "TCSS450",
+    "Mobile",
+    "Apps"
+  ],
+  "author": "Tanner Brown",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "form-data": "^2.3.2",
+    "mysql": "^2.15.0",
+    "npm": "^5.7.1",
+    "pg": "^7.4.1",
+    "pg-promise": "^8.1.1",
+    "request": "^2.88.0"
+  }
+}
