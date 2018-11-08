@@ -10,6 +10,7 @@ const app = express();
 
 // app.use('/params', require('./routes/params.js'));
 app.use('/login', require('./routes/login.js'));
+app.use('/messaging', require('./routes/messaging.js'));
 app.use('/weather', require('./routes/weather.js'));
 app.use('/register', require('./routes/register.js'));
 

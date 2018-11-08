@@ -10,4 +10,5 @@ if(!db) {
     process.exit(1);
 }
 
+
 module.exports = db;
