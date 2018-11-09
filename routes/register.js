@@ -9,7 +9,7 @@ let db = require('../util/utils').db;
 
 let getHash = require('../util/utils').getHash;
 
-let sendVerificationEmail = require('../util/utils').sendVerificationEmail;
+let sendVerificationEmail = require('../util/utils').sendVerificationEmail();
 
 var router = express.Router();
 
@@ -25,7 +25,11 @@ let varificationURL = "tcss450group6-backend.herokuapp.com/verify?email=";
 
 router.post('/resend', (req, res) => {
     var email = req.body['email'];
-    //url = "tcss450group6-backend.herokuapp.com/verify?email=" + email;
+
+    // let url="https://tcss450group6-backend.herokuapp.com/verify?email="+reciever;
+    // let message = "<strong>Welcome to our app!</strong> <p>Please follow the link below to verify your account!</p> <p>" + url + "</p>"
+    // sendEmail("", reciever, "Welcome to Hoolichat! Verification Required!", message);
+
     sendVerificationEmail(email);
    // sendEmail(email, email, "Welcome! Account Verification Required", "<strong>Welcome to our app!</strong> </br> <a href=url>Please click this link to verify your account!</a>");
 });

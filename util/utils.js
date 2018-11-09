@@ -23,7 +23,6 @@ var mailOptions = {
 
 function sendEmail(from, receiver, subj, message) {
 
-
     mailOptions.to = receiver;
     mailOptions.subject = subj;
     mailOptions.text = message;
@@ -65,5 +64,5 @@ function getHash(pw, salt) {
 
 
 module.exports = {
-    db, getHash, sendEmail
+    db, getHash, sendEmail,sendVerificationEmail
 };
