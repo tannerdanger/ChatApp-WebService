@@ -6,26 +6,29 @@ var nodemailer = require('nodemailer');
 //We use this create the SHA256 hash
 const crypto = require("crypto");
 
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'hoolichat.authenticator@gmail.com',
-        pass: 'piedpiper' //YOLO      (burner email I don't care).
-    }
-});
 
-var mailOptions = {
-    from: 'hoolichat.authenticator@gmail.com',
-    to: '',
-    subject: '',
-    text: ''
-};
+
+
 
 function sendEmail(from, receiver, subj, message) {
 
-    mailOptions.to = receiver;
-    mailOptions.subject = subj;
-    mailOptions.text = message;
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'hoolichat.authenticator@gmail.com',
+            pass: 'piedpiper' //YOLO      (burner email I don't care).
+        }
+    });
+    var mailOptions = {
+        from: 'hoolichat.authenticator@gmail.com',
+        to: receiver,
+        subject: subj,
+        text: message
+    };
+    console.log("email from: " + mailOptions.from);
+    console.log("email to:" + mailOptions.to);
+    console.log("login: " +transporter.auth.user.toString());
+    console.log("password: "+transporter.auth.pass.toString());
 
     transporter.sendMail(mailOptions, function(error, info){
         if (error) {
