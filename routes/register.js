@@ -19,16 +19,16 @@ router.use(bodyParser.json());
 
 let varificationURL = "tcss450group6-backend.herokuapp.com/verify?email=";
 
-router.post('/verify', (req, res) => {
+// router.post('/verify', (req, res) => {
+//
+// }
 
-}
-
-router.post('/resend', (req, res) => {
+router.get('/resend', (req, res) => {
     var email = req.body['email'];
     //url = "tcss450group6-backend.herokuapp.com/verify?email=" + email;
     sendVerificationEmail(email);
    // sendEmail(email, email, "Welcome! Account Verification Required", "<strong>Welcome to our app!</strong> </br> <a href=url>Please click this link to verify your account!</a>");
-}
+});
 
 router.post('/', (req, res) => {
     res.type("application/json");
