@@ -23,7 +23,7 @@ let varificationURL = "tcss450group6-backend.herokuapp.com/verify?email=";
 //
 // }
 
-router.get('/resend', (req, res) => {
+router.post('/resend', (req, res) => {
     var email = req.body['email'];
     //url = "tcss450group6-backend.herokuapp.com/verify?email=" + email;
     sendVerificationEmail(email);
