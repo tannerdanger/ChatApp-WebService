@@ -1,26 +1,32 @@
 //Get the connection to Heroku Database
 let db = require('./sql_conn.js');
 
+var nodemailer = require('nodemailer');
 
 //We use this create the SHA256 hash
 const crypto = require("crypto");
 
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'hoolichat.authenticator@gmail.com',
+        pass: 'piedpiper' //YOLO      (burner email I don't care).
+    }
+});
+
+var mailOptions = {
+    from: 'hoolichat.authenticator@gmail.com',
+    to: '',
+    subject: '',
+    text: ''
+};
+
 function sendEmail(from, receiver, subj, message) {
 
-    var nodemailer = require('nodemailer');
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'hoolichat.authenticator@gmail.com',
-            pass: 'piedpiper' //YOLO      (burner email I don't care).
-        }
-    });
-    var mainOptions = {
-        from: 'hoolichat.authenticator@gmail.com',
-        to: receiver,
-        subject: subj,
-        text: message
-    };
+
+    mailOptions.to = receiver;
+    mailOptions.subject = subj;
+    mailOptions.text = message;
 
     transporter.sendMail(mailOptions, function(error, info){
         if (error) {
@@ -44,7 +50,6 @@ function sendVerificationEmail(reciever){
     let url="https://tcss450group6-backend.herokuapp.com/verify?email="+reciever;
     let message = "<strong>Welcome to our app!</strong> <p>Please follow the link below to verify your account!</p> <p>" + url + "</p>"
     sendEmail("", reciever, "Welcome to Hoolichat! Verification Required!", message);
-
 }
 
 /**
