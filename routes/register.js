@@ -17,21 +17,40 @@ const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
 
-let varificationURL = "tcss450group6-backend.herokuapp.com/verify?email=";
 
-// router.post('/verify', (req, res) => {
-//
-// }
+const saltkey = "bigshoeapple";
+
+router.get('/verify', (req, res) => {
+    console.log("verifying new user: "+email);
+    if(getHash(saltkey, req.query['email']) === req.query['key']){
+        //UPDATE members SET verification = 1 WHERE email = 'test@test.com2';
+        let query = `UPDATE members SET verification = 1 WHERE email =$1`;
+        db.none(query, req.query['email'])
+            .then(() => {
+            //We successfully verified the user, let the user know
+                console.log("new user verified");
+            res.send({
+                success: true
+            });
+        }).catch((err) => {
+            //log the error
+            console.log(err);
+            res.send({
+                success: false,
+                error: err
+            });
+        });
+    } else {
+        res.send({
+            success: false
+        });
+    }
+});
 
 router.post('/resend', (req, res) => {
     var email = req.body['email'];
 
-    // let url="https://tcss450group6-backend.herokuapp.com/verify?email="+reciever;
-    // let message = "<strong>Welcome to our app!</strong> <p>Please follow the link below to verify your account!</p> <p>" + url + "</p>"
-    // sendEmail("", reciever, "Welcome to Hoolichat! Verification Required!", message);
-
-    sendVerificationEmail(email);
-   // sendEmail(email, email, "Welcome! Account Verification Required", "<strong>Welcome to our app!</strong> </br> <a href=url>Please click this link to verify your account!</a>");
+    sendVerificationEmail(email, getHash(saltkey, email));
 });
 
 router.post('/', (req, res) => {
@@ -62,7 +81,7 @@ router.post('/', (req, res) => {
                 res.send({
                     success: true
                 });
-                sendVerificationEmail(email);
+                sendVerificationEmail(email, getHash(saltkey, email));
             }).catch((err) => {
             //log the error
             console.log(err);

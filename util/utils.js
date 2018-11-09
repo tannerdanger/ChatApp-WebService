@@ -9,7 +9,6 @@ const crypto = require("crypto");
 
 
 
-
 function sendEmail(from, receiver, subj, message) {
 
     var transporter = nodemailer.createTransport({
@@ -23,12 +22,12 @@ function sendEmail(from, receiver, subj, message) {
         from: 'hoolichat.authenticator@gmail.com',
         to: receiver,
         subject: subj,
-        text: message
+        html: message
     };
     console.log("email from: " + mailOptions.from);
     console.log("email to:" + mailOptions.to);
-    console.log("login: " +transporter.auth.user.toString());
-    console.log("password: "+transporter.auth.pass.toString());
+    // console.log("login: " + transporter.user.toString() );
+    // console.log("password: "+transporter.auth.pass.toString());
 
     transporter.sendMail(mailOptions, function(error, info){
         if (error) {
@@ -48,9 +47,9 @@ function sendEmail(from, receiver, subj, message) {
 
 }
 
-function sendVerificationEmail(reciever){
-    let url="https://tcss450group6-backend.herokuapp.com/verify?email="+reciever;
-    let message = "<strong>Welcome to our app!</strong> <p>Please follow the link below to verify your account!</p> <p>" + url + "</p>"
+function sendVerificationEmail(reciever, key){
+    let url="https://tcss450group6-backend.herokuapp.com/register/verify?key="+ key +"&email=" +reciever;
+    let message = "<strong>Welcome to our app!</strong> <p>Please follow the link below to verify your account!</p> <p>" + url + "</p>";
     sendEmail("", reciever, "Welcome to Hoolichat! Verification Required!", message);
 }
 
