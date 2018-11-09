@@ -6,6 +6,29 @@ let db = require('./sql_conn.js');
 const crypto = require("crypto");
 
 function sendEmail(from, receiver, subj, message) {
+
+    var nodemailer = require('nodemailer');
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'hoolichat.authenticator@gmail.com',
+            pass: 'piedpiper' //YOLO      (burner email I don't care).
+        }
+    });
+    var mainOptions = {
+        from: 'hoolichat.authenticator@gmail.com',
+        to: receiver,
+        subject: subj,
+        text: message
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
     //research nodemailer for sending email from node.
     // https://nodemailer.com/about/
     // https://www.w3schools.com/nodejs/nodejs_email.asp
@@ -14,7 +37,14 @@ function sendEmail(from, receiver, subj, message) {
     //similar to the DATABASE_URL and PHISH_DOT_NET_KEY (later section of the lab)
 
     //fake sending an email for now. Post a message to logs.
-    console.log('Email sent: ' + message);
+
+}
+
+function sendVerificationEmail(reciever){
+    let url="https://tcss450group6-backend.herokuapp.com/verify?email="+reciever;
+    let message = "<strong>Welcome to our app!</strong> <p>Please follow the link below to verify your account!</p> <p>" + url + "</p>"
+    sendEmail("", reciever, "Welcome to Hoolichat! Verification Required!", message);
+
 }
 
 /**

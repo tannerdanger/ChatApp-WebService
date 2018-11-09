@@ -9,13 +9,26 @@ let db = require('../util/utils').db;
 
 let getHash = require('../util/utils').getHash;
 
-let sendEmail = require('../util/utils').sendEmail;
+let sendVerificationEmail = require('../util/utils').sendVerificationEmail;
 
 var router = express.Router();
 
 const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
+
+let varificationURL = "tcss450group6-backend.herokuapp.com/verify?email=";
+
+router.post('/verify', (req, res) => {
+
+}
+
+router.post('/resend', (req, res) => {
+    var email = req.body['email'];
+    //url = "tcss450group6-backend.herokuapp.com/verify?email=" + email;
+    sendVerificationEmail(email);
+   // sendEmail(email, email, "Welcome! Account Verification Required", "<strong>Welcome to our app!</strong> </br> <a href=url>Please click this link to verify your account!</a>");
+}
 
 router.post('/', (req, res) => {
     res.type("application/json");
@@ -45,7 +58,7 @@ router.post('/', (req, res) => {
                 res.send({
                     success: true
                 });
-                sendEmail(email, email, "Welcome!", "<strong>Welcome to our app!</strong>");
+                sendVerificationEmail(email);
             }).catch((err) => {
             //log the error
             console.log(err);
