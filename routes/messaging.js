@@ -31,7 +31,6 @@ router.post("/send", (req, res) => {
                   WHERE email=$3`;
     db.none(insert, [chatId, message, email])
         .then(() => {
-
             //send a notification of this message to ALL members with registered tokens
             db.manyOrNone('SELECT * FROM FCM_Token')
                 .then(rows => {
@@ -64,7 +63,7 @@ router.post("/getAll", (req, res) => {
                  FROM Messages
                  INNER JOIN Members ON Messages.MemberId=Members.MemberId
                  WHERE ChatId=$1 
-                 ORDER BY Timestamp DESC`
+                 ORDER BY Timestamp DESC`;
     db.manyOrNone(query, [chatId])
         .then((rows) => {
             res.send({

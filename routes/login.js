@@ -32,9 +32,27 @@ router.post('/', (req, res) => {
                 let wasCorrectPw = ourSaltedHash === theirSaltedHash;
 
                 //Send whether they had the correct password or not
-                res.send({
-                    success: wasCorrectPw
-                });
+                if(wasCorrectPw) {
+                    //get all user info from DB
+                    db.one('SELECT * FROM Members WHERE Email=$1', [email])
+                    //if successful
+                        .then((row) => {
+                            res.send({
+                                success: true,
+                                userdata:row
+                            })
+                        }).catch((err) => {
+                        res.send({
+                            success: true,
+                            userdata: "failed to retrieve",
+                            error: err
+                        })
+                    });
+                } else {
+                    res.send({
+                        success: false
+                    });
+                }
             })
             //More than one row shouldn't be found, since table has constraint on it
             .catch((err) => {
