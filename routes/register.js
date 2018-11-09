@@ -21,11 +21,13 @@ router.use(bodyParser.json());
 const saltkey = "bigshoeapple";
 
 router.get('/verify', (req, res) => {
+    email = req.query['email'];
+    key = req.query['key'];
     console.log("verifying new user: "+email);
-    if(getHash(saltkey, req.query['email']) === req.query['key']){
+    if(getHash(saltkey, email) === key){
         //UPDATE members SET verification = 1 WHERE email = 'test@test.com2';
-        let query = `UPDATE members SET verification = 1 WHERE email =$1`;
-        db.none(query, req.query['email'])
+        let query = "UPDATE members SET verification = 1 WHERE email =$1";
+        db.none(query, email)
             .then(() => {
             //We successfully verified the user, let the user know
                 console.log("new user verified");
