@@ -34,7 +34,7 @@ router.post('/', (req, res) => {
                 //Send whether they had the correct password or not
                 if(wasCorrectPw) {
                     //get all user info from DB
-                    db.one('SELECT * FROM Members WHERE Email=$1', [email])
+                    db.one('SELECT memberid, firstname, lastname, username, email, verification FROM Members WHERE Email=$1', [email])
                     //if successful
                         .then((row) => {
                             res.send({
