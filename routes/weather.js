@@ -1,3 +1,9 @@
+/**
+ * Tanner Brown
+ * @type {router}
+ * Router for handling weather forecast retrieval.
+ */
+
 const API_KEY = process.env.WEATHER_KEY;
 
 //express is the framework we're going to use to handle requests

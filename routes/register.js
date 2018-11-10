@@ -1,3 +1,9 @@
+/**
+ * Tanner Brown
+ * @type {router}
+ * Router for handling user registration.
+ */
+
 //express is the framework we're going to use to handle requests
 const express = require('express');
 
@@ -11,6 +17,8 @@ let getHash = require('../util/utils').getHash;
 
 let sendVerificationEmail = require('../util/utils').sendVerificationEmail;
 
+let queries = require('../util/queries').MISC_QUERIES;
+
 var router = express.Router();
 
 const bodyParser = require("body-parser");
@@ -18,16 +26,18 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
 
-const saltkey = "bigshoeapple";
+const SALTKEY = "bigshoeapple";
+//TODO: FOr user verification, make sure the user being verirified exists.
+
 
 router.get('/verify', (req, res) => {
     email = req.query['email'];
     key = req.query['key'];
     console.log("verifying new user: "+email);
-    if(getHash(saltkey, email) === key){
+    if(getHash(SALTKEY, email) === key){
         //UPDATE members SET verification = 1 WHERE email = 'test@test.com2';
-        let query = "UPDATE members SET verification = 1 WHERE email =$1";
-        db.none(query, email)
+
+        db.none(queries.VERIFY_USER_ACCOUNT, email)
             .then(() => {
             //We successfully verified the user, let the user know
                 console.log("new user verified");
@@ -52,7 +62,7 @@ router.get('/verify', (req, res) => {
 router.post('/resend', (req, res) => {
     var email = req.body['email'];
 
-    sendVerificationEmail(email, getHash(saltkey, email));
+    sendVerificationEmail(email, getHash(SALTKEY, email));
 });
 
 router.post('/', (req, res) => {
@@ -77,13 +87,13 @@ router.post('/', (req, res) => {
         //We're using placeholders ($1, $2, $3) in the SQL query string to avoid SQL Injection
         //If you want to read more: https://stackoverflow.com/a/8265319
         let params = [first, last, username, email, salted_hash, salt];
-        db.none("INSERT INTO MEMBERS(FirstName, LastName, Username, Email, Password, Salt) VALUES ($1, $2, $3, $4, $5, $6)", params)
+        db.none(queries.INSERT_NEW_MEMBER, params)
             .then(() => {
                 //We successfully added the user, let the user know
                 res.send({
                     success: true
                 });
-                sendVerificationEmail(email, getHash(saltkey, email));
+                sendVerificationEmail(email, getHash(SALTKEY, email));
             }).catch((err) => {
             //log the error
             console.log(err);
@@ -104,3 +114,10 @@ router.post('/', (req, res) => {
 });
 
 module.exports = router;
+
+/*  OLD QUERIES:
+
+let query = "UPDATE members SET verification = 1 WHERE email =$1";
+let query = 'INSERT INTO MEMBERS(FirstName, LastName, Username, Email, Password, Salt) VALUES ($1, $2, $3, $4, $5, $6)';
+
+ */
