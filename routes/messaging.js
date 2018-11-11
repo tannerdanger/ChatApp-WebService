@@ -117,7 +117,7 @@ router.post("/send", (req, res) => {
     db.none(queries.INSERT_MESSAGE, [chatId, message, email])
         .then(() => {
             //send a notification of this message to ALL members with registered tokens
-            db.manyOrNone('SELECT * FROM FCM_Token')
+            db.manyOrNone(queries.GET_ALL_TOKENS_IN_A_CHAT)
                 .then(rows => {
                     rows.forEach(element => {
                         fcm_functions.sendToIndividual(element['token'], message, email);
@@ -130,6 +130,7 @@ router.post("/send", (req, res) => {
                 res.send({
                     success: false,
                     error: err,
+                    msg: "message sent but Firebase Token doesn't exist. User will not recieve notification"
                 });
             })
         }).catch((err) => {

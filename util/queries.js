@@ -46,15 +46,20 @@ const GET_ALL_MESSAGES_BY_CHATID = `SELECT Members.Email, Messages.Message, Memb
                  WHERE ChatId=$1
                  ORDER BY Timestamp DESC;`;
 
-MESSAGING_QUERIES = {GET_CHATID_BY_NAME, CREATE_CHATROOM, ADD_MEMBERS_TO_CHATROOM, INSERT_MESSAGE, GET_ALL_MESSAGES_BY_CHATID};
+const GET_ALL_TOKENS_IN_A_CHAT = `SELECT token FROM fcm_token JOIN chatmembers on chatmembers.memberid = fcm_token.memberid WHERE chatmembers.chatid = 10;`;
+
+MESSAGING_QUERIES = {GET_CHATID_BY_NAME, CREATE_CHATROOM, ADD_MEMBERS_TO_CHATROOM, INSERT_MESSAGE, GET_ALL_MESSAGES_BY_CHATID, GET_ALL_TOKENS_IN_A_CHAT};
 
 
 const VERIFY_USER_ACCOUNT = "UPDATE members SET verification = 1 WHERE email =$1";
 
 const INSERT_NEW_MEMBER = 'INSERT INTO MEMBERS(FirstName, LastName, Username, Email, Password, Salt) VALUES ($1, $2, $3, $4, $5, $6)';
 
+const GET_FB_TOKEM_BY_EMAIL = 'SELECT fcm_token.token FROM fcm_token JOIN Members on Members.memberid = fcm_token.memberid WHERE Members.email = $1;';
 
-MISC_QUERIES = {VERIFY_USER_ACCOUNT, INSERT_NEW_MEMBER};
+const GET_USERDATA_BY_EMAIL = 'SELECT memberid, firstname, lastname, username, email, verification FROM Members WHERE Email=$1';
+
+MISC_QUERIES = {VERIFY_USER_ACCOUNT, INSERT_NEW_MEMBER, GET_FB_TOKEM_BY_EMAIL, GET_USERDATA_BY_EMAIL};
 
 module.exports = {
     CONNECTION_QUERIES, MESSAGING_QUERIES, MISC_QUERIES
