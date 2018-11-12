@@ -142,6 +142,23 @@ router.post("/send", (req, res) => {
     });
 });
 
+
+router.post("/getmy", (req, res) => {
+    let memberid = req.body['memberid'];
+    db.manyOrNone(queries.GET_ALL_CHATS_BY_MEMBERID, memberid)
+        .then((rows) => {
+            res.send({
+                chats: rows
+            })
+        }).catch((err) => {
+            res.send({
+                success:false,
+                error: err
+            })
+
+    });
+});
+
 //Get all of the messages from a chat session with id chatid
 router.post("/getAll", (req, res) => {
     let chatId = req.body['chatId'];

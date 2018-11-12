@@ -51,7 +51,7 @@ router.post("/search", (req, res) => {
             });
         } else {
             console.log("No unique, searching for " + searchquery + " by similar matches");
-
+            searchquery = '%' + searchquery + '%';
 
             db.manyOrNone(queries.FIND_CONTACT_BYREST, searchquery)
                 .then(data => {
