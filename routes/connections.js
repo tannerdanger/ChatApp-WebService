@@ -30,7 +30,7 @@ router.post("/search", (req, res) => {
     let searchquery = req.query['query'];
 
     //first, search for unique
-    db.one(queries.FIND_UNIQUE_CONTACT, searchquery)
+    db.one(queries.FIND_UNIQUE_CONTACT, [memberid, searchquery])
         .then(data => {
 
             if(data != null ){

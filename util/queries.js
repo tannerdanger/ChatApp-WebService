@@ -13,13 +13,37 @@ const ACCEPT_CONNECTION = `UPDATE contacts SET verified = 1
                                    AND (memberid_a = $1 AND "memberid_b" = $2)
                               OR (memberid_a = $2 AND memberid_b = $1);`;
 
-const FIND_UNIQUE_CONTACT = `SELECT memberid, firstname, lastname, username, email FROM members where username~*$1 OR email~*$1;`;
+// const FIND_UNIQUE_CONTACT = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
+//                              FROM members
+//                                     INNER JOIN contacts
+//                                       ON (Contacts.memberid_a = members.memberid AND Contacts.memberid_b != $1)
+//                                            OR (Contacts.memberid_b = members.memberid AND Contacts.memberid_a != $1)
 
-const FIND_CONTACT_BYREST = `SELECT memberid, firstname, lastname, username, email FROM members WHERE firstname ilike $1
-                                                                                                   OR lastname ilike $1
-                                                                                                   OR username ilike  $1`;
+// const FIND_UNIQUE_CONTACT = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
+//                              FROM members
+//                                    FULL OUTER JOIN contacts
+//                                       ON (Contacts.memberid_a = members.memberid OR Contacts.memberid_b = members.memberid)
+//                                            AND (Contacts.memberid_b != $1 AND Contacts.memberid_a != $1)
+//                              WHERE  members.memberid != $1 AND (members.email ILIKE $2 OR members.username ILIKE $2);`;
+const FIND_UNIQUE_CONTACT = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
+                             FROM members
+                                    LEFT OUTER JOIN contacts
+                                      ON (members.memberid IN (Contacts.memberid_b, Contacts.memberid_a) AND $1 NOT IN (contacts.memberid_a, contacts.memberid_b))
+--                                            AND (Contacts.memberid_b != $1 AND Contacts.memberid_a != $1)
+                             WHERE  members.memberid != $1 AND (members.email ~* $2 OR members.username ~* $2);`;
 
-const GET_ALL_CONTACTS = `SELECT Members.email, Members.memberid, Members.firstname, Members.lastname, Members.username, Contacts.verified
+//const FIND_CONTACT_BYREST = `SELECT memberid, firstname, lastname, username, email FROM members WHERE firstname ilike $1
+//                                                                                                   OR lastname ilike $1
+//                                                                                                   OR username ilike  $1`;
+
+const FIND_CONTACT_BYREST = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
+                             FROM members
+                                    LEFT OUTER JOIN contacts
+                                      ON (members.memberid IN (Contacts.memberid_b, Contacts.memberid_a) AND $1 NOT IN (contacts.memberid_a, contacts.memberid_b))
+    --                                            AND (Contacts.memberid_b != $1 AND Contacts.memberid_a != $1)
+                             WHERE  members.memberid != $1 AND (members.username ILIKE $2 OR members.firstname ILIKE $2 OR members.lastname ILIKE $2);`;
+
+const GET_ALL_CONTACTS = `SELECT DISTINCT Members.email, Members.memberid, Members.firstname, Members.lastname, Members.username, Contacts.verified
                           FROM Members
                                  INNER JOIN Contacts
                                    ON (Members.MemberID = Contacts.memberid_a AND Contacts.memberid_b = $1)
@@ -42,7 +66,7 @@ const INSERT_MESSAGE = `INSERT INTO Messages(ChatId, Message, MemberId)
 const GET_ALL_CHATS_BY_MEMBERID = `SELECT *
                                    FROM chats
                                           JOIN chatmembers ON chatmembers.chatid = chats.chatid
-                                   WHERE chatmembers.memberid = 18;`;
+                                   WHERE chatmembers.memberid = $1;`;
 
 const GET_ALL_MESSAGES_BY_CHATID = `SELECT Members.Email, Messages.Message, Members.memberid,
                                            to_char(Messages.Timestamp AT TIME ZONE 'PDT', 'YYYY-MM-DD HH24:MI:SS.US' ) AS Timestamp
