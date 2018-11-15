@@ -53,7 +53,7 @@ router.post("/search", (req, res) => {
             console.log("No unique, searching for " + searchquery + " by similar matches");
             searchquery = '%' + searchquery + '%';
 
-            db.manyOrNone(queries.FIND_CONTACT_BYREST, searchquery)
+            db.manyOrNone(queries.FIND_CONTACT_BYREST, [memberid, searchquery])
                 .then(data => {
                     if (null != data && null != data[0]) {
                         console.log("Match found by query");

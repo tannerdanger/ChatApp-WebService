@@ -25,16 +25,20 @@ const ACCEPT_CONNECTION = `UPDATE contacts SET verified = 1
 //                                       ON (Contacts.memberid_a = members.memberid OR Contacts.memberid_b = members.memberid)
 //                                            AND (Contacts.memberid_b != $1 AND Contacts.memberid_a != $1)
 //                              WHERE  members.memberid != $1 AND (members.email ILIKE $2 OR members.username ILIKE $2);`;
-const FIND_UNIQUE_CONTACT = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
-                             FROM members
-                                    LEFT OUTER JOIN contacts
-                                      ON (members.memberid IN (Contacts.memberid_b, Contacts.memberid_a) AND $1 NOT IN (contacts.memberid_a, contacts.memberid_b))
---                                            AND (Contacts.memberid_b != $1 AND Contacts.memberid_a != $1)
-                             WHERE  members.memberid != $1 AND (members.email ~* $2 OR members.username ~* $2);`;
 
 //const FIND_CONTACT_BYREST = `SELECT memberid, firstname, lastname, username, email FROM members WHERE firstname ilike $1
 //                                                                                                   OR lastname ilike $1
 //                                                                                                   OR username ilike  $1`;
+
+//                                           AND (Contacts.memberid_b != $1 AND Contacts.memberid_a != $1)
+
+const FIND_UNIQUE_CONTACT = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
+                             FROM members
+                                    LEFT OUTER JOIN contacts
+                                      ON (members.memberid IN (Contacts.memberid_b, Contacts.memberid_a) AND $1 NOT IN (contacts.memberid_a, contacts.memberid_b))
+                             WHERE  members.memberid != $1 AND (members.email ~* $2 OR members.username ~* $2);`;
+
+
 
 const FIND_CONTACT_BYREST = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
                              FROM members
@@ -73,7 +77,7 @@ const GET_ALL_MESSAGES_BY_CHATID = `SELECT Members.Email, Messages.Message, Memb
                                     FROM Messages
                                            INNER JOIN Members ON Messages.MemberId=Members.MemberId
                                     WHERE ChatId=$1
-                                    ORDER BY Timestamp DESC;`;
+                                    ORDER BY Timestamp ASC ;`;
 
 const GET_ALL_TOKENS_IN_A_CHAT = `SELECT token FROM fcm_token JOIN chatmembers on chatmembers.memberid = fcm_token.memberid WHERE chatmembers.chatid = 10;`;
 
