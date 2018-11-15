@@ -160,7 +160,7 @@ router.post("/getmy", (req, res) => {
 });
 
 //Get all of the messages from a chat session with id chatid
-router.post("/getAll", (req, res) => {
+router.post("/getall", (req, res) => {
     let chatId = req.body['chatId'];
 
     db.manyOrNone(queries.GET_ALL_MESSAGES_BY_CHATID, [chatId])

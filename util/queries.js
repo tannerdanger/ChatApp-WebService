@@ -77,7 +77,7 @@ const GET_ALL_MESSAGES_BY_CHATID = `SELECT Members.Email, Messages.Message, Memb
                                     FROM Messages
                                            INNER JOIN Members ON Messages.MemberId=Members.MemberId
                                     WHERE ChatId=$1
-                                    ORDER BY Timestamp ASC ;`;
+                                    ORDER BY Timestamp ASC;`;
 
 const GET_ALL_TOKENS_IN_A_CHAT = `SELECT token FROM fcm_token JOIN chatmembers on chatmembers.memberid = fcm_token.memberid WHERE chatmembers.chatid = 10;`;
 
