@@ -79,9 +79,15 @@ const GET_ALL_MESSAGES_BY_CHATID = `SELECT Members.Email, Messages.Message, Memb
                                     WHERE ChatId=$1
                                     ORDER BY Timestamp ASC;`;
 
+const GET_ALL_MY_MESSAGES = `SELECT *
+                             FROM chats
+                                    JOIN chatmembers ON chatmembers.chatid = chats.chatid
+                                    JOIN messages ON messages.chatid = chats.chatid
+                             WHERE chatmembers.memberid = $1;`;
+
 const GET_ALL_TOKENS_IN_A_CHAT = `SELECT token FROM fcm_token JOIN chatmembers on chatmembers.memberid = fcm_token.memberid WHERE chatmembers.chatid = 10;`;
 
-MESSAGING_QUERIES = {GET_CHATID_BY_NAME, CREATE_CHATROOM, ADD_MEMBERS_TO_CHATROOM, INSERT_MESSAGE, GET_ALL_MESSAGES_BY_CHATID, GET_ALL_TOKENS_IN_A_CHAT, GET_ALL_CHATS_BY_MEMBERID};
+MESSAGING_QUERIES = {GET_CHATID_BY_NAME, CREATE_CHATROOM, ADD_MEMBERS_TO_CHATROOM, INSERT_MESSAGE, GET_ALL_MESSAGES_BY_CHATID, GET_ALL_TOKENS_IN_A_CHAT, GET_ALL_CHATS_BY_MEMBERID, GET_ALL_MY_MESSAGES};
 
 
 const VERIFY_USER_ACCOUNT = "UPDATE members SET verification = 1 WHERE email =$1";

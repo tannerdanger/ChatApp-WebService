@@ -155,7 +155,6 @@ router.post("/getmy", (req, res) => {
                 success:false,
                 error: err
             })
-
     });
 });
 
@@ -166,6 +165,7 @@ router.post("/getall", (req, res) => {
     db.manyOrNone(queries.GET_ALL_MESSAGES_BY_CHATID, [chatId])
         .then((rows) => {
             res.send({
+                chatid: chatId,
                 messages: rows
             })
         }).catch((err) => {
