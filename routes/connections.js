@@ -128,6 +128,27 @@ router.post("/propose", (req, res) => {
     })
 });
 
+/**
+ * Deletes a friend from the database.
+ */
+router.post("/remove", (req, res) => {
+
+    var sender = req.body['sender_id'];
+    var target = req.body['recipient_id'];
+
+    db.none(queries.REMOVE_CONNECTION, [sender, target])
+        .then(() => {
+            res.send({
+                success:true
+            });
+        }).catch((err)=>{
+        res.send({
+            success:false,
+            error: err
+        });
+    })
+});
+
 router.post("/approve", (req, res) => {
 
     var sender = req.body['sender_id'];

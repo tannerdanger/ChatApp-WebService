@@ -8,6 +8,10 @@ const PROPOSE_CONNECTION = `INSERT INTO contacts (memberid_a, memberid_b)
                                            OR memberid_a = $2 and memberid_b = $1
                                 );`;
 
+const REMOVE_CONNECTION = `DELETE FROM contacts 
+                              WHERE (memberid_b = $1 AND memberid_a = $2)
+                                OR(memberid_a = $1 AND memberid_b = $2);`;
+
 const ACCEPT_CONNECTION = `UPDATE contacts SET verified = 1
                            WHERE verified = 0
                                    AND (memberid_a = $1 AND "memberid_b" = $2)
@@ -36,7 +40,7 @@ const FIND_CONTACT_BYREST = `SELECT DISTINCT  members.memberid, members.firstnam
                                            AND (Contacts.memberid_b != $1 AND Contacts.memberid_a != $1)
                              WHERE  members.memberid != $1 AND (members.username ILIKE $2 OR members.firstname ILIKE $2 OR members.lastname ILIKE $2);`;
 
-CONNECTION_QUERIES = {PROPOSE_CONNECTION, ACCEPT_CONNECTION, FIND_UNIQUE_CONTACT, FIND_CONTACT_BYREST, GET_ALL_CONTACTS};
+CONNECTION_QUERIES = {PROPOSE_CONNECTION, ACCEPT_CONNECTION, FIND_UNIQUE_CONTACT, FIND_CONTACT_BYREST, GET_ALL_CONTACTS, REMOVE_CONNECTION};
 
 //***************** MESSAGING QUERIES **********//
 
