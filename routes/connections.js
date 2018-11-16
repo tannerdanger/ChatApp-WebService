@@ -25,59 +25,87 @@ let queries = require('../util/queries').CONNECTION_QUERIES;
  */
 router.post("/search", (req, res) => {
 
-    var isMatch = false;
+
     var memberid = req.body['memberid'];
     let searchquery = req.query['query'];
 
     //first, search for unique
     db.one(queries.FIND_UNIQUE_CONTACT, [memberid, searchquery])
-        .then(data => {
+        .then((data) => {
 
-            if(data != null ){
-                console.log("Match found by username");
+            res.send({
+                success: true,
+                user: data
+            });
+
+        }).catch((err) => {
+        //match not found
+        searchquery = "%" + searchquery + "%";
+        db.manyOrNone(queries.FIND_CONTACT_BYREST, [memberid, searchquery])
+            .then((data) => {
+                res.send({
+                    success: true,
+                    user: data
+                });
+            }).catch((err) => {
+            res.send({
+                success:false,
+                msg: "no user found"
+            });
+        });
+    });
+});
+// db.one(queries.FIND_UNIQUE_CONTACT, [memberid, searchquery])
+
+
+/*
+db.one(queries.FIND_UNIQUE_CONTACT, [memberid, searchquery])
+    .then(data => {
+        console.log("Match found by username");
+        res.send({
+            success: true,
+            data: data
+        });
+
+    }).catch((err) => {
+    //log the error
+    console.log(err);
+});
+//if unique match not found, check to make sure the length of the query is 4+ characters, then search by that
+if (searchquery.toString().length < 4) {
+    res.send({
+        success: false,
+        data: "Search parameters too small. Try searching with more than 3 characters."
+    });
+} else {
+    console.log("No unique, searching for " + searchquery + " by similar matches");
+    searchquery = '%' + searchquery + '%';
+
+    db.manyOrNone(queries.FIND_CONTACT_BYREST, [memberid, searchquery])
+        .then(data => {
+            if (null != data && null != data[0]) {
+                console.log("Match found by query");
                 res.send({
                     success: true,
                     data: data
                 });
             } else {
-
-            }
-        }).catch((err) => {
-        //if unique match not found, check to make sure the length of the query is 4+ characters, then search by that
-        if (searchquery.toString().length < 4) {
-            res.send({
-                success: false,
-                data: "Search parameters too small. Try searching with more than 3 characters."
-            });
-        } else {
-            console.log("No unique, searching for " + searchquery + " by similar matches");
-            searchquery = '%' + searchquery + '%';
-
-            db.manyOrNone(queries.FIND_CONTACT_BYREST, [memberid, searchquery])
-                .then(data => {
-                    if (null != data && null != data[0]) {
-                        console.log("Match found by query");
-                        res.send({
-                            success: true,
-                            data: data
-                        });
-                    } else {
-                        res.send({
-                            success: false,
-                            data: "No matches for: '" + searchquery + "' found!"
-                        });
-                    }
-                }).catch((err) => {
-                //log the error
-                console.log(err);
                 res.send({
                     success: false,
                     data: "No matches for: '" + searchquery + "' found!"
                 });
-            });
-        }
+            }
+        }).catch((err) => {
+        //log the error
+        console.log(err);
+        res.send({
+            success: false,
+            data: "No matches for: '" + searchquery + "' found!"
+        });
     });
+}
 });
+*/
 
 /**
  * Adds a friend request to the database. Checks to ensure an existing request doesn't exist.
@@ -140,7 +168,7 @@ router.post("/getall", (req, res) => {
 module.exports = router;
 
 /**
-    OLD QUERIES
+ OLD QUERIES
 
 
  const QUERY_PROPOSE = `INSERT INTO contacts(memberid_a, memberid_b) SELECT $1, $2
