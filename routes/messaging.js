@@ -61,7 +61,8 @@ router.post("/new", (req, res) =>{
                             .then(() => {
                                 //We successfully created a chat and all tables properly updated
                                 res.send({
-                                    success: true
+                                    success: true,
+                                    chatid: chatID
                                 });
 
                             }).catch((err) => {
@@ -86,9 +87,12 @@ router.post("/new", (req, res) =>{
 
             }).catch((err) => {
             //log the error
+            var chats = {};
+            chats = err["result"].chatid;
             console.log(err);
             res.send({
                 success: false,
+                chatid: chats,
                 error: err
             });
         });
@@ -128,7 +132,7 @@ router.post("/send", (req, res) => {
                         success: true
                     });
                 }).catch((err) => {
-                    console.log("Location 1 - error: "+err);
+                console.log("Location 1 - error: "+err);
                 res.send({
                     success: false,
                     error: err,
@@ -153,10 +157,10 @@ router.post("/getmy", (req, res) => {
                 chats: rows
             })
         }).catch((err) => {
-            res.send({
-                success:false,
-                error: err
-            })
+        res.send({
+            success:false,
+            error: err
+        })
     });
 });
 
@@ -185,14 +189,14 @@ module.exports = router;
 /**
  OLD QUERIES FOR SAVING
 
-  insert = `INSERT INTO Messages(ChatId, Message, MemberId)
-                SELECT $1, $2, MemberId FROM Members
-                WHERE email=$3`;
+ insert = `INSERT INTO Messages(ChatId, Message, MemberId)
+ SELECT $1, $2, MemberId FROM Members
+ WHERE email=$3`;
 
-insertchats = `INSERT into chats(name) VALUES($1)`;
-insertchatmembers = `INSERT into chatmembers(chatid, memberid) VALUES($1, $2),($3, $4)`;
-selectchatID = `SELECT chatid FROM chats WHERE name =$1`;
-retrieveUser = `SELECT * from members where memberid = $1`;
+ insertchats = `INSERT into chats(name) VALUES($1)`;
+ insertchatmembers = `INSERT into chatmembers(chatid, memberid) VALUES($1, $2),($3, $4)`;
+ selectchatID = `SELECT chatid FROM chats WHERE name =$1`;
+ retrieveUser = `SELECT * from members where memberid = $1`;
 
  //getall
  query = `SELECT Members.Email, Messages.Message, Members.memberid,
