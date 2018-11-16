@@ -15,6 +15,7 @@ const request = require('request');
 
 //retrieve the router object from express
 var router = express.Router();
+let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
 
 const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
@@ -23,8 +24,8 @@ router.use(bodyParser.json());
 //add a post route to the router.
 router.post("/current", (req, res) => {
     console.log(req.body);
-    let lat = req.body['lat'];
-     let lon = req.body['lon'];
+    let lat = req.body[JSONconsts.LAT];
+     let lon = req.body[JSONconsts.LON];
      //base values in case lat/lon is empty
      if(!lat || !lon) {
         lat = 47.2098;
@@ -47,8 +48,8 @@ router.post("/current", (req, res) => {
 router.post("/day", (req, res) => {
 
     console.log(req.body);
-    let lat = req.body['lat'];
-    let lon = req.body['lon'];
+    let lat = req.body[JSONconsts.LAT];
+    let lon = req.body[JSONconsts.LON];
     //base values in case lat/lon is empty
     if(!lat || !lon) {
         lat = 47.2098;
@@ -71,8 +72,8 @@ router.post("/day", (req, res) => {
 
 router.post("/tenday", (req, res) => {
     console.log(req.body);
-    let lat = req.body['lat'];
-    let lon = req.body['lon'];
+    let lat = req.body[JSONconsts.LAT];
+    let lon = req.body[JSONconsts.LON];
     //base values in case lat/lon is empty
     if(!lat || !lon) {
         lat = 47.2098;

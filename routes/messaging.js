@@ -18,6 +18,7 @@ router.use(bodyParser.json());
 
 let fcm_functions = require('../util/utils').fcm_functions;
 let queries = require('../util/queries').MESSAGING_QUERIES;
+let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
 /**
  * Tested working 9/nov
  *  requires params:
@@ -33,14 +34,14 @@ router.post("/new", (req, res) =>{
     //TODO: check if users are connected
     //TODO: check if users currently have a connection
 
-    let sender_id = req.body["sender_id"];
-    let sender_username = req.body["sender_username"];
-    let recipient_id = req.body["recipient_id"];
-    let recipient_username = req.body["recipient_username"];
+    let sender_id = req.body[JSONconsts.MYID];
+    let sender_username = req.body[JSONconsts.MYUN];
+    let recipient_id = req.body[JSONconsts.THERID];
+    let recipient_username = req.body[JSONconsts.THEIRUN];
 
 
     if( sender_id && recipient_id && sender_username && recipient_username ) {
-
+        console.log("success 1");
         let chatName = sender_username + ", " + recipient_username;
 
         //insert into table chats
@@ -50,7 +51,8 @@ router.post("/new", (req, res) =>{
                 db.one(queries.GET_CHATID_BY_NAME, chatName)
                 //if successful
                     .then(rows => {
-                        chatID = rows["chatid"];
+                        console.log(rows[0]);
+                        chatID = rows[JSONconsts.CHAT];
                         //insert into table chatmembers
                         console.log("Got here 1, chatID:" +chatID + "|  recipientid:"+recipient_id +"|  senderID:"+sender_id) ;
                         let params = [chatID, recipient_id, chatID, sender_id];
@@ -101,9 +103,9 @@ router.post("/new", (req, res) =>{
 
 //send a message to all users "in" the chat session with chatId
 router.post("/send", (req, res) => {
-    let email = req.body['email'];
-    let message = req.body['message'];
-    let chatId = req.body['chatId'];
+    let email = req.body[JSONconsts.EMAIL];
+    let message = req.body[JSONconsts.MSG];
+    let chatId = req.body[JSONconsts.CHAT];
 
     if(!email || !message || !chatId) {
         res.send({
@@ -120,7 +122,7 @@ router.post("/send", (req, res) => {
             db.manyOrNone(queries.GET_ALL_TOKENS_IN_A_CHAT)
                 .then(rows => {
                     rows.forEach(element => {
-                        fcm_functions.sendToIndividual(element['token'], message, email);
+                        fcm_functions.sendToIndividual(element[JSONconsts.TOKEN], message, email);
                     });
                     res.send({
                         success: true
@@ -144,7 +146,7 @@ router.post("/send", (req, res) => {
 
 
 router.post("/getmy", (req, res) => {
-    let memberid = req.body['memberid'];
+    let memberid = req.body[JSONconsts.MYID];
     db.manyOrNone(queries.GET_ALL_CHATS_BY_MEMBERID, memberid)
         .then((rows) => {
             res.send({
@@ -160,7 +162,7 @@ router.post("/getmy", (req, res) => {
 
 //Get all of the messages from a chat session with id chatid
 router.post("/getall", (req, res) => {
-    let chatId = req.body['chatId'];
+    let chatId = req.body[JSONconsts.CHAT];
 
     db.manyOrNone(queries.GET_ALL_MESSAGES_BY_CHATID, [chatId])
         .then((rows) => {

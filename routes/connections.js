@@ -8,6 +8,7 @@
 //express is the framework we're going to use to handle requests
 const express = require('express');
 
+
 //Create connection to Heroku Database
 let db = require('../util/utils').db;
 
@@ -18,6 +19,7 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
 let queries = require('../util/queries').CONNECTION_QUERIES;
+let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
 
 /**
  * User's info comes in body, search query comes in URI params.
@@ -26,8 +28,8 @@ let queries = require('../util/queries').CONNECTION_QUERIES;
 router.post("/search", (req, res) => {
 
 
-    var memberid = req.body['memberid'];
-    let searchquery = req.query['query'];
+    var memberid = req.body[JSONconsts.MYID];
+    let searchquery = req.query[JSONconsts.QUERY];
 
     //first, search for unique
     db.one(queries.FIND_UNIQUE_CONTACT, [memberid, searchquery])
@@ -112,8 +114,8 @@ if (searchquery.toString().length < 4) {
  */
 router.post("/propose", (req, res) => {
 
-    var sender = req.body['sender_id'];
-    var target = req.body['recipient_id'];
+    var sender = req.body[JSONconsts.MYID];
+    var target = req.body[JSONconsts.THERID];
 
     db.none(queries.PROPOSE_CONNECTION, [sender, target])
         .then(() => {
@@ -133,8 +135,8 @@ router.post("/propose", (req, res) => {
  */
 router.post("/remove", (req, res) => {
 
-    var sender = req.body['sender_id'];
-    var target = req.body['recipient_id'];
+    var sender = req.body[JSONconsts.MYID];
+    var target = req.body[JSONconsts.THERID];
 
     db.none(queries.REMOVE_CONNECTION, [sender, target])
         .then(() => {
@@ -151,8 +153,8 @@ router.post("/remove", (req, res) => {
 
 router.post("/approve", (req, res) => {
 
-    var sender = req.body['sender_id'];
-    var target = req.body['recipient_id'];
+    var sender = req.body[JSONconsts.MYID];
+    var target = req.body[JSONconsts.THERID];
     db.none(queries.ACCEPT_CONNECTION, [sender, target])
         .then(() => {
             res.send({
@@ -172,7 +174,7 @@ router.post("/approve", (req, res) => {
  * Returns accepted and unaccepted requests, which are identified as "verified".
  */
 router.post("/getall", (req, res) => {
-    let memberID = req.body['sender_id'];
+    let memberID = req.body[JSONconsts.MYID];
     db.manyOrNone(queries.GET_ALL_CONTACTS, [memberID])
         .then((rows) => {
             res.send({

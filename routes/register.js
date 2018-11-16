@@ -19,6 +19,8 @@ let sendVerificationEmail = require('../util/utils').sendVerificationEmail;
 
 let queries = require('../util/queries').MISC_QUERIES;
 
+let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
+
 var router = express.Router();
 
 const bodyParser = require("body-parser");
@@ -26,15 +28,14 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
 
-const SALTKEY = "bigshoeapple";
 //TODO: FOr user verification, make sure the user being verirified exists.
 
 
 router.get('/verify', (req, res) => {
-    email = req.query['email'];
-    key = req.query['key'];
+    email = req.query[JSONconsts.EMAIL];
+    key = req.query[JSONconsts.KEY];
     console.log("verifying new user: "+email);
-    if(getHash(SALTKEY, email) === key){
+    if(getHash(JSONconsts.SALTKEY, email) === key){
         //UPDATE members SET verification = 1 WHERE email = 'test@test.com2';
 
         db.none(queries.VERIFY_USER_ACCOUNT, email)
@@ -60,9 +61,9 @@ router.get('/verify', (req, res) => {
 });
 
 router.post('/resend', (req, res) => {
-    var email = req.body['email'];
+    var email = req.body[JSONconsts.EMAIL];
 
-    sendVerificationEmail(email, getHash(SALTKEY, email));
+    sendVerificationEmail(email, getHash(JSONconsts.SALTKEY, email));
 });
 
 router.post('/', (req, res) => {
@@ -71,9 +72,9 @@ router.post('/', (req, res) => {
     //Retrieve data from query params
     var first = req.body['first'];
     var last = req.body['last'];
-    var username = req.body['username'];
-    var email = req.body['email'];
-    var password = req.body['password'];
+    var username = req.body[JSONconsts.MYUN];
+    var email = req.body[JSONconsts.EMAIL];
+    var password = req.body[JSONconsts.PASSWORD];
     //Verify that the caller supplied all the parameters
     //In js, empty strings or null values evaluate to false
     if(first && last && username && email && password) {
