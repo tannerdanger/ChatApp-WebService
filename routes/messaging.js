@@ -19,6 +19,96 @@ router.use(bodyParser.json());
 let fcm_functions = require('../util/utils').fcm_functions;
 let queries = require('../util/queries').MESSAGING_QUERIES;
 let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
+
+router.post("/new", (req, res ) => {
+    let sender_id = req.body[JSONconsts.MYID];
+    let sender_username = req.body[JSONconsts.MYUN];
+    let recipient_id = req.body[JSONconsts.THERID];
+    let recipient_username = req.body[JSONconsts.THEIRUN];
+    var id_a, id_b, name_a, name_b;
+
+    if( sender_id && recipient_id && sender_username && recipient_username ) {
+        console.log("success 1");
+        //sort id's so it is consistent
+        if(sender_id < recipient_id){
+            id_a = sender_id;
+            name_a = sender_username;
+            id_b = recipient_id;
+            name_b = recipient_username;
+        } else {
+            id_a = recipient_id;
+            name_a = recipient_username;
+            id_b = sender_id;
+            name_b = sender_username;
+        }
+        var loc = "location 1";
+        let chatName = name_a + ", " + name_b;
+        db.one(queries.CREATE_CHATROOM_NOT_EXISTS, chatName) //create chat
+            .then((rows) => {
+                console.log(loc);
+                db.one(queries.GET_CHATID_BY_NAME, chatName)
+                    .then((data) => {
+                        loc = "location 2";
+                        console.log(loc);
+                        // res.send({
+                        //     loc: "location 1",
+                        //     data: data['chatid']
+                        // })
+                        let params = [data['chatid'], id_a];
+                        db.oneOrNone(queries.ADD_MEMBER_TO_CHAT, params)
+                            .then((data) => {
+                                res.send({
+                                    loc: loc,
+                                    chatid: data['chatid']
+                                });
+                            }).catch((err) =>{
+                            let params = [data['chatid'], id_b];
+
+                            db.oneOrNone(queries.ADD_MEMBER_TO_CHAT, params)
+                                .then((data) => {
+                                    res.send({
+                                        loc: "loc 6",
+                                        chatid: data['chatid']
+                                    });
+                                }).catch((err) =>{
+
+                            });
+
+                            res.send({
+                                loc: "location 5",
+                                chatid: data['chatid'],
+                                error: err
+                            })
+                        });
+
+                    }).catch((err) =>{
+                    loc = loc + " catch";
+                    console.log(loc);
+                    res.send({
+                        loc: loc,
+                        data: err
+                    })
+                });
+                // res.send({
+                //     loc: "location 1",
+                //     data: rows
+                // })
+            }).catch((err) =>{ //chat exists, return chatid
+            loc = loc + " catch";
+            console.log(loc);
+            db.one(queries.GET_CHATID_BY_NAME, chatName)
+                .then((data) => {
+                    loc = loc + "_1";
+                    res.send({
+                        exists: true,
+                        chatid: data['chatid'],
+                        loc: loc
+                    })
+                });
+        });
+    }
+});
+
 /**
  * Tested working 9/nov
  *  requires params:
@@ -28,7 +118,7 @@ let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
  "recipient_id":the recipient's memberid,
  "recipient_username":"the recipient's username,"
  */
-router.post("/new", (req, res) =>{
+router.post("/oldnew", (req, res) =>{
     //TODO: pass in member id
     //TODO: check if users exist
     //TODO: check if users are connected
@@ -38,28 +128,63 @@ router.post("/new", (req, res) =>{
     let sender_username = req.body[JSONconsts.MYUN];
     let recipient_id = req.body[JSONconsts.THERID];
     let recipient_username = req.body[JSONconsts.THEIRUN];
+    var id_a, id_b, name_a, name_b;
 
 
     if( sender_id && recipient_id && sender_username && recipient_username ) {
         console.log("success 1");
-        let chatName = sender_username + ", " + recipient_username;
+        //sort id's so it is consistent
+        if(sender_id < recipient_id){
+            id_a = sender_id;
+            name_a = sender_username;
+            id_b = recipient_id;
+            name_b = recipient_username;
+        } else {
+            id_a = recipient_id;
+            name_a = recipient_username;
+            id_b = sender_id;
+            name_b = sender_username;
+        }
+        let chatName = name_a + ", " + name_b;
+
 
         //insert into table chats
-        db.none(queries.CREATE_CHATROOM, chatName)
+        db.none(queries.CREATE_CHATROOM_NOT_EXISTS, chatName) //create chat
             .then(() => {
+                console.log("success 2");
                 //get chatid from that chat
-                db.one(queries.GET_CHATID_BY_NAME, chatName)
+                db.one(queries.GET_CHATID_BY_NAME, chatName) //get chat id
                 //if successful
                     .then(rows => {
-                        console.log(rows[0]);
+
                         chatID = rows[JSONconsts.CHAT];
                         //insert into table chatmembers
-                        console.log("Got here 1, chatID:" +chatID + "|  recipientid:"+recipient_id +"|  senderID:"+sender_id) ;
-                        let params = [chatID, recipient_id, chatID, sender_id];
-                        db.none(queries.ADD_MEMBERS_TO_CHATROOM, params)
+                        console.log("Success 3, chatID:" +chatID + "|  id_a:"+id_a +"|  id_b:"+id_b) ;
+                        let params = [chatID, id_a];//, chatID, id_b];
+                        //db.none(queries.ADD_MEMBERS_TO_CHATROOM, params)
+                        db.none(queries.ADD_MEMBER_TO_CHAT, params) //add first member to chat
                         //if successful
                             .then(() => {
                                 //We successfully created a chat and all tables properly updated
+                                // res.send({
+                                //     success: true,
+                                //     chatid: chatID
+                                // });
+
+                            }).catch((err) => {
+                            //log the error
+                            console.log(err);
+
+                            res.send({
+                                success: false,
+                                error: err
+                            });
+                        });
+                        params = [chatID, id_b];
+                        db.none(queries.ADD_MEMBER_TO_CHAT, params)
+                        //if successful
+                            .then(() => {
+                                // We successfully created a chat and all tables properly updated
                                 res.send({
                                     success: true,
                                     chatid: chatID
@@ -70,6 +195,7 @@ router.post("/new", (req, res) =>{
                             console.log(err);
 
                             res.send({
+                                chatid: chatid,
                                 success: false,
                                 error: err
                             });
@@ -86,14 +212,20 @@ router.post("/new", (req, res) =>{
 
 
             }).catch((err) => {
-            //log the error
-            var chats = {};
-            chats = err["result"].chatid;
-            console.log(err);
-            res.send({
-                success: false,
-                chatid: chats,
-                error: err
+            console.log("error at 1");
+            db.one(`SELECT chatid FROM chats WHERE name = $1`, chatName)
+                .then((data) => {
+                    res.send({
+                        exists:true,
+                        chatid: data
+                    })
+                }).catch((err) => {
+                console.log("error at 2");
+                res.send({
+                    success: false,
+                    chatid: chats,
+                    error: err
+                })
             });
         });
     } else {

@@ -46,9 +46,14 @@ CONNECTION_QUERIES = {PROPOSE_CONNECTION, ACCEPT_CONNECTION, FIND_UNIQUE_CONTACT
 
 const GET_CHATID_BY_NAME = `SELECT chatid FROM chats WHERE name =$1`;
 
-const ADD_MEMBERS_TO_CHATROOM = `INSERT into chatmembers(chatid, memberid) VALUES($1, $2),($3, $4)`;
+//const ADD_MEMBERS_TO_CHATROOM = `INSERT into chatmembers(chatid, memberid) VALUES($1, $2),($3, $4)`;
+const ADD_MEMBER_TO_CHAT = `INSERT into chatmembers(chatid, memberid) SELECT $1, $2 WHERE not exists(SELECT 1 from chatmembers where chatid = $1 and memberid = $2);`;
 
-const CREATE_CHATROOM = `INSERT into chats(name) VALUES($1)`;
+const ADD_MEMBERS_TO_CHATROOM = `INSERT into chatmembers(chatid, memberid) SELECT($1, $2),($3, $4) WHERE not exists(select 1 from chatmembers where chatid = $1 and memberid = $2);`;
+
+const CREATE_CHATROOM = `INSERT into chats(name) VALUES($1)`; //where where not exists (select 1 from hats where name = 42);
+
+const CREATE_CHATROOM_NOT_EXISTS = `INSERT INTO chats(name) SELECT $1 where not exists (select 1 from chats where name = $1) returning chats.chatid`;
 
 const INSERT_MESSAGE = `INSERT INTO Messages(ChatId, Message, MemberId)
                         SELECT $1, $2, MemberId FROM Members
@@ -74,7 +79,7 @@ const GET_ALL_MY_MESSAGES = `SELECT *
 
 const GET_ALL_TOKENS_IN_A_CHAT = `SELECT token FROM fcm_token JOIN chatmembers on chatmembers.memberid = fcm_token.memberid WHERE chatmembers.chatid = 10;`;
 
-MESSAGING_QUERIES = {GET_CHATID_BY_NAME, CREATE_CHATROOM, ADD_MEMBERS_TO_CHATROOM, INSERT_MESSAGE, GET_ALL_MESSAGES_BY_CHATID, GET_ALL_TOKENS_IN_A_CHAT, GET_ALL_CHATS_BY_MEMBERID, GET_ALL_MY_MESSAGES};
+MESSAGING_QUERIES = {GET_CHATID_BY_NAME, CREATE_CHATROOM, ADD_MEMBERS_TO_CHATROOM, INSERT_MESSAGE, GET_ALL_MESSAGES_BY_CHATID, GET_ALL_TOKENS_IN_A_CHAT, GET_ALL_CHATS_BY_MEMBERID, GET_ALL_MY_MESSAGES, CREATE_CHATROOM_NOT_EXISTS, ADD_MEMBER_TO_CHAT};
 
 
 const VERIFY_USER_ACCOUNT = "UPDATE members SET verification = 1 WHERE email =$1";
