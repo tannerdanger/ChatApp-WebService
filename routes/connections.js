@@ -116,7 +116,7 @@ if (searchquery.toString().length < 4) {
 router.post("/propose", (req, res) => {
 
     var sender = req.body[JSONconsts.MYID];
-    var senderName = req.body[JSONconsts.THEIRUN];
+    var senderName = req.body[JSONconsts.MYUN];
     var target = req.body[JSONconsts.THERID];
 
     console.log("sender:" + sender + " senderName: " + senderName + " targetID: " + target);

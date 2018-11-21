@@ -77,7 +77,7 @@ const GET_ALL_MY_MESSAGES = `SELECT *
                                     JOIN messages ON messages.chatid = chats.chatid
                              WHERE chatmembers.memberid = $1;`;
 
-const GET_ALL_TOKENS_IN_A_CHAT = `SELECT token FROM fcm_token JOIN chatmembers on chatmembers.memberid = fcm_token.memberid WHERE chatmembers.chatid = 10;`;
+const GET_ALL_TOKENS_IN_A_CHAT = `SELECT token FROM fcm_token JOIN chatmembers on chatmembers.memberid = fcm_token.memberid WHERE chatmembers.chatid = $1;`;
 
 MESSAGING_QUERIES = {GET_CHATID_BY_NAME, CREATE_CHATROOM, ADD_MEMBERS_TO_CHATROOM, INSERT_MESSAGE, GET_ALL_MESSAGES_BY_CHATID, GET_ALL_TOKENS_IN_A_CHAT, GET_ALL_CHATS_BY_MEMBERID, GET_ALL_MY_MESSAGES, CREATE_CHATROOM_NOT_EXISTS, ADD_MEMBER_TO_CHAT};
 

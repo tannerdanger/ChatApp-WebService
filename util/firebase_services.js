@@ -72,7 +72,7 @@ function sendConnectionRequest(token, fromID, fromName){
 }
 
 //use to send message to a specific client by the token
-function sendToIndividual(token, msg, from) {
+function sendToIndividual(token, msg, from, chatid) {
 
     //build the message for FCM to send
     var message = {
@@ -87,6 +87,7 @@ function sendToIndividual(token, msg, from) {
                 "type": "msg",
                 "sender": from,
                 "message": msg,
+                "chatid":chatid.toString(),
             }
         },
         "token": token

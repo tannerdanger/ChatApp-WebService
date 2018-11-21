@@ -15,6 +15,7 @@ var router = express.Router();
 const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
+let fcm_functions = require('../util/utils').fcm_functions;
 
 
 let queries = require('../util/queries').MESSAGING_QUERIES;
@@ -240,8 +241,12 @@ router.post("/oldnew", (req, res) =>{
 //send a message to all users "in" the chat session with chatId
 router.post("/send", (req, res) => {
     let email = req.body[JSONconsts.EMAIL];
+    let username = req.body[JSONconsts.MYUN];
     let message = req.body[JSONconsts.MSG];
     let chatId = req.body[JSONconsts.CHAT];
+
+    if(null != username){email = username;}
+
 
     if(!email || !message || !chatId) {
         res.send({
@@ -255,10 +260,10 @@ router.post("/send", (req, res) => {
     db.none(queries.INSERT_MESSAGE, [chatId, message, email])
         .then(() => {
             //send a notification of this message to ALL members with registered tokens
-            db.manyOrNone(queries.GET_ALL_TOKENS_IN_A_CHAT)
+            db.manyOrNone(queries.GET_ALL_TOKENS_IN_A_CHAT, chatId)
                 .then(rows => {
                     rows.forEach(element => {
-                        fcm_functions.sendToIndividual(element[JSONconsts.TOKEN], message, email);
+                        fcm_functions.sendToIndividual(element[JSONconsts.TOKEN], message, email, chatId);
                     });
                     res.send({
                         success: true
