@@ -8,8 +8,6 @@
 //express is the framework we're going to use to handle requests
 const express = require('express');
 
-
-
 //Create connection to Heroku Database
 let db = require('../util/utils').db;
 let getHash = require('../util/utils').getHash;
