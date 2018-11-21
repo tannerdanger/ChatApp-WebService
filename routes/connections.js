@@ -18,8 +18,9 @@ const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
 
-let queries = require('../util/queries').CONNECTION_QUERIES;
+let queries = require('../util/queries').ALL_QUERIES;
 let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
+let fcm_functions = require('../util/utils').fcm_functions;
 
 /**
  * User's info comes in body, search query comes in URI params.
@@ -115,10 +116,21 @@ if (searchquery.toString().length < 4) {
 router.post("/propose", (req, res) => {
 
     var sender = req.body[JSONconsts.MYID];
+    var senderName = req.body[JSONconsts.THEIRUN];
     var target = req.body[JSONconsts.THERID];
+
+    console.log("sender:" + sender + " senderName: " + senderName + " targetID: " + target);
 
     db.none(queries.PROPOSE_CONNECTION, [sender, target])
         .then(() => {
+            console.log("location 1 success");
+            db.one(queries.GET_FB_TOKEN_BY_ID, target)
+                .then(data => {
+                    console.log("location 2 success");
+                    console.log("TOken: " + data['token']);
+                    fcm_functions.sendConnectionRequest(data['token'], sender, senderName);
+                });
+
             res.send({
                 success:true
             });

@@ -41,6 +41,36 @@ function sendToTopic(msg, from, topic) {
         });
 }
 
+//send notifications
+function sendConnectionRequest(token, fromID, fromName){
+
+    var message = {
+        android: {
+            notification: {
+                title: 'New Connection Request',
+                body: fromName + ' wants to connect with you.',
+                icon: '@drawable/ic_notification_phish',
+                color: "#0000FF",
+            },
+            data:{
+                "type": "connection_req",
+                "sender": fromID.toString()
+            }
+        },
+        "token": token
+    };
+    console.log(message);
+
+    admin.messaging().send(message)
+        .then((response) => {
+            console.log('Successfully sent message:', response);
+        })
+        .catch((error) => {
+            console.log('Error sending message:', error);
+        });
+
+}
+
 //use to send message to a specific client by the token
 function sendToIndividual(token, msg, from) {
 
@@ -77,7 +107,7 @@ function sendToIndividual(token, msg, from) {
 }
 
 
-let fcm_functions = { sendToTopic, sendToIndividual };
+let fcm_functions = { sendToTopic, sendToIndividual, sendConnectionRequest };
 
 module.exports = {
     admin, fcm_functions

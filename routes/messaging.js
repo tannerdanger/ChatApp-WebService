@@ -16,7 +16,7 @@ const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
 
-let fcm_functions = require('../util/utils').fcm_functions;
+
 let queries = require('../util/queries').MESSAGING_QUERIES;
 let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
 

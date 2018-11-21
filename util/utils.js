@@ -62,7 +62,7 @@ function sendVerificationEmail(reciever, key){
 function getHash(pw, salt) {
     return crypto.createHash("sha256").update(pw + salt).digest("hex");
 }
-
+let queries = require('./queries.js').queries;
 let admin = require('./firebase_services.js').admin;
 let fcm_functions = require('./firebase_services.js').fcm_functions;
 module.exports = {
