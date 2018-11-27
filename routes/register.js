@@ -17,6 +17,8 @@ let getHash = require('../util/utils').getHash;
 
 let sendVerificationEmail = require('../util/utils').sendVerificationEmail;
 
+let sendRecoveryEmail = require('../util/utils').sendRecoveryEmail;
+
 let queries = require('../util/queries').MISC_QUERIES;
 
 let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
@@ -29,11 +31,96 @@ router.use(bodyParser.json());
 
 
 //TODO: FOr user verification, make sure the user being verirified exists.
+router.post('/recover', (req, res) => {
 
+    var email = req.body[JSONconsts.EMAIL];
+    var day = new Date();
+    var decoder = day.getDay() + 3;
+    var code = getHash(JSONconsts.SALTKEY, email);
+
+    console.log(code);
+
+    code = code.toString().substr(decoder,5);
+    console.log(decoder);
+    console.log("recover code: ", code);
+
+    sendRecoveryEmail(email, code);
+
+});
+
+router.post('/updatepw', (req, res) =>{
+
+    var id = req.body[JSONconsts.MYID];
+    var email = req.body[JSONconsts.EMAIL];
+    var incode = req.body[JSONconsts.CODE];
+    var pw = req.body[JSONconsts.PASSWORD];
+
+    var day = new Date();
+    var decoder = day.getDay() + 3;
+    var code = getHash(JSONconsts.SALTKEY, email);
+
+
+    console.log(code);
+
+    code = code.toString().substr(decoder,5);
+    console.log(decoder);
+    console.log("recover code: ", code);
+
+    isMatch = (incode.toString()===code.toString());
+
+    if(isMatch){
+
+        let salt = crypto.randomBytes(32).toString("hex");
+        let salted_hash = getHash(pw, salt);
+
+        params = [ salted_hash, salt, id];
+        db.none(queries.UPDATE_PASSWORD, params)
+            .then(() =>{
+                db.one('SELECT MemberID, Password, firstname, lastname, username, verification, Salt FROM Members WHERE Email=$1', [email])
+                    .then(row => {
+
+                        let firstname = row['firstname'];
+                        let lastname = row['lastname'];
+                        let id = row[JSONconsts.MYID];
+                        let username = row[JSONconsts.MYUN];
+                        let verification = row['verification'];
+
+                        userdata = {firstname, lastname, username, id, email, verification};
+                        res.send({
+                            success: true,
+                            user:userdata
+                        });
+
+
+                    }).catch((err) => {
+                    res.send({
+                        success: false,
+                        error: err
+                    });
+                })
+            }).catch((err) => {
+            res.send({
+                success: false,
+                error: err
+            });
+        })
+
+
+
+
+    }else{
+        res.send({
+            success: false,
+            message: "code did not match"
+        });
+    }
+
+
+});
 
 router.get('/verify', (req, res) => {
-    email = req.query[JSONconsts.EMAIL];
-    key = req.query[JSONconsts.KEY];
+    let email = req.query[JSONconsts.EMAIL];
+    let key = req.query[JSONconsts.KEY];
     console.log("verifying new user: "+email);
     if(getHash(JSONconsts.SALTKEY, email) === key){
         //UPDATE members SET verification = 1 WHERE email = 'test@test.com2';
@@ -64,6 +151,7 @@ router.post('/resend', (req, res) => {
     var email = req.body[JSONconsts.EMAIL];
 
     sendVerificationEmail(email, getHash(JSONconsts.SALTKEY, email));
+
 });
 
 router.post('/', (req, res) => {

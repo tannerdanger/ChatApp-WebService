@@ -13,10 +13,11 @@ const SALTKEY = "bigshoeapple";
 const LAT = 'lat';
 const LON = 'lon';
 const KEY = 'key';
+const CODE = 'code';
 
 const USERDATA = 'userdata';
 
-JSON_CONSTS = {MYID, THERID, QUERY, EMAIL, TOKEN, PASSWORD, SALT, MSG, CHAT, MYUN, THEIRUN, SALTKEY, LAT, LON, KEY};
+JSON_CONSTS = {MYID, THERID, QUERY, EMAIL, TOKEN, PASSWORD, SALT, MSG, CHAT, MYUN, THEIRUN, SALTKEY, LAT, LON, KEY, CODE};
 
 module.exports = {
     JSON_CONSTS

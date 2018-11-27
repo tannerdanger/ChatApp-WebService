@@ -53,6 +53,13 @@ function sendVerificationEmail(reciever, key){
     sendEmail("", reciever, "Welcome to Hoolichat! Verification Required!", message);
 }
 
+function sendRecoveryEmail(reciever, code){
+
+
+     let message = "<p>You requested to change your password</p> <p>Please copy the following code into the Hooli Chat app to change your password.</p> <h2><strong>" + code + "</strong></h2>";
+     sendEmail("hoolichat.authenticator@gmail.com", reciever, "Password Recovery", message )
+}
+
 /**
  * Method to get a salted hash.
  * We put this in its own method to keep consistency
@@ -66,5 +73,5 @@ let queries = require('./queries.js').queries;
 let admin = require('./firebase_services.js').admin;
 let fcm_functions = require('./firebase_services.js').fcm_functions;
 module.exports = {
-    db, getHash, sendEmail,sendVerificationEmail, admin, fcm_functions
+    db, getHash, sendEmail,sendVerificationEmail, admin, fcm_functions, sendRecoveryEmail
 };
