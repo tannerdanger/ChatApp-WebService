@@ -45,7 +45,10 @@ router.post('/recover', (req, res) => {
     console.log("recover code: ", code);
 
     sendRecoveryEmail(email, code);
-
+    if(null != email)
+        res.send({msg:"email sent"});
+    else
+        res.send({msg:"email failed to send"});
 });
 
 router.post('/updatepw', (req, res) =>{
@@ -127,12 +130,12 @@ router.get('/verify', (req, res) => {
 
         db.none(queries.VERIFY_USER_ACCOUNT, email)
             .then(() => {
-            //We successfully verified the user, let the user know
+                //We successfully verified the user, let the user know
                 console.log("new user verified");
-            res.send({
-                success: true
-            });
-        }).catch((err) => {
+                res.send({
+                    success: true
+                });
+            }).catch((err) => {
             //log the error
             console.log(err);
             res.send({
