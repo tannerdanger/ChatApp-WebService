@@ -147,20 +147,18 @@ router.post("/propose", (req, res) => {
  */
 router.post("/remove", (req, res) => {
 
-    var sender = req.body[JSONconsts.MYID];
-    var target = req.body[JSONconsts.THERID];
+    db.task('remove chat', t => {
+        return t.batch([
 
-    db.none(queries.REMOVE_CONNECTION, [sender, target])
-        .then(() => {
-            res.send({
-                success:true
-            });
-        }).catch((err)=>{
-        res.send({
-            success:false,
-            error: err
-        });
-    })
+            t.any(queries.REMOVE_CHATMEMBERS_BY_CHATID, chatid),
+            t.any(queries.REMOVE_CHATS_BY_CHATID, chatid),
+            t.any(queries.REMOVE_CONNECTION, )
+        ]);
+    }).then(data => {
+        res.send(data)
+    }).catch(err => {
+        res.send(err)
+    });
 });
 
 router.post("/approve", (req, res) => {

@@ -18,7 +18,7 @@ router.use(bodyParser.json());
 let fcm_functions = require('../util/utils').fcm_functions;
 
 
-let queries = require('../util/queries').MESSAGING_QUERIES;
+let queries = require('../util/queries').ALL_QUERIES;
 let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
 
 router.post("/new", (req, res ) => {
@@ -237,6 +237,27 @@ router.post("/oldnew", (req, res) =>{
         });
     }
 });
+
+router.post("/remove", (req, res) =>{
+
+
+    let chatid = req.body[JSONconsts.CHAT];
+    let memberid_a = req.body[JSONconsts.MYID];
+    let memberid_b = req.body[JSONconsts.THERID];
+
+     db.task('remove chat', t => {
+         return t.batch([
+             t.any(queries.REMOVE_CHATMEMBERS_BY_CHATID, chatid),
+             t.any(queries.REMOVE_CHATS_BY_CHATID, chatid),
+             t.any(queries.REMOVE_CONNECTION, memberid_a, memberid_b)
+         ]);
+     }).then(data => {
+         res.send(data)
+     }).catch(err => {
+         res.send(err)
+     });
+});
+
 
 //send a message to all users "in" the chat session with chatId
 router.post("/send", (req, res) => {
