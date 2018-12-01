@@ -81,7 +81,7 @@ function sendToIndividual(token, msg, from, chatid) {
                 title: 'New Message from '.concat(from),
                 body: msg,
                 color: "#0000FF",
-                icon: '@drawable/ic_notification_phish'
+                icon: '@drawable/ic_notification_alert'
             },
             data: {
                 "type": "msg",
