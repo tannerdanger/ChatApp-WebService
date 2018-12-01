@@ -64,7 +64,7 @@ const GET_ALL_CHATS_BY_MEMBERID = `SELECT *
                                           JOIN chatmembers ON chatmembers.chatid = chats.chatid
                                    WHERE chatmembers.memberid = $1;`;
 
-const GET_ALL_MESSAGES_BY_CHATID = `SELECT Members.Email, Messages.Message, Members.memberid,
+const GET_ALL_MESSAGES_BY_CHATID = `SELECT Members.username, Messages.Message, Members.memberid,
                                            to_char(Messages.Timestamp AT TIME ZONE 'PDT', 'YYYY-MM-DD HH24:MI:SS.US' ) AS Timestamp
                                     FROM Messages
                                            INNER JOIN Members ON Messages.MemberId=Members.MemberId
