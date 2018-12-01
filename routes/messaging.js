@@ -235,12 +235,13 @@ router.post("/remove", (req, res) =>{
 
 //send a message to all users "in" the chat session with chatId
 router.post("/send", (req, res) => {
-    let email = req.body[JSONconsts.EMAIL];
-    let username = req.body[JSONconsts.MYUN];
-    let message = req.body[JSONconsts.MSG];
-    let chatId = req.body[JSONconsts.CHAT];
+    var username = req.body[JSONconsts.MYUN];
+    var message = req.body[JSONconsts.MSG];
+    var chatId = req.body[JSONconsts.CHAT];
 
-    if(null == username){username = email;}
+    console.log(username);
+
+
 
 
     if(!username || !message || !chatId) {
