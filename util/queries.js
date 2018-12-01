@@ -1,6 +1,6 @@
 //***************** CONNECTION QUERIES **********//
-const PROPOSE_CONNECTION = `INSERT INTO contacts (memberid_a, memberid_b)
-                            SELECT $1, $2
+const PROPOSE_CONNECTION = `INSERT INTO contacts (memberid_a, memberid_b, requested_by)
+                            SELECT $1, $2, $3
                             WHERE NOT EXISTS(
                                         SELECT memberid_a, memberid_b
                                         FROM contacts

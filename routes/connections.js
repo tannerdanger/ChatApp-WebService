@@ -118,21 +118,36 @@ router.post("/propose", (req, res) => {
     var sender = req.body[JSONconsts.MYID];
     var senderName = req.body[JSONconsts.MYUN];
     var target = req.body[JSONconsts.THERID];
+    var member_a, member_b;
+    if (sender < target){
+        member_a = sender;
+        member_b = target
+    }else{
+        member_a = target;
+        member_b = sender;
+    }
 
     console.log("sender:" + sender + " senderName: " + senderName + " targetID: " + target);
 
-    db.none(queries.PROPOSE_CONNECTION, [sender, target])
+    db.none(queries.PROPOSE_CONNECTION, [member_a, member_b, sender])
         .then(() => {
             console.log("location 1 success");
             db.one(queries.GET_FB_TOKEN_BY_ID, target)
                 .then(data => {
                     console.log("location 2 success");
                     console.log("TOken: " + data['token']);
-                    fcm_functions.sendConnectionRequest(data['token'], sender, senderName);
+                    fcm_functions.sendConnectionRequest(data['token'], sender, senderName); //notify user of friend request
+                    res.send({
+                        success:true
+                    });
+                }).catch(err =>{
+                console.log("error: ", err);
+                res.send({
+                    success:true,
+                    msg:"request sent but user not notified.",
+                    err: err
                 });
 
-            res.send({
-                success:true
             });
         }).catch((err)=>{
         res.send({
