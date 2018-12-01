@@ -57,7 +57,7 @@ const CREATE_CHATROOM_NOT_EXISTS = `INSERT INTO chats(name) SELECT $1 where not 
 
 const INSERT_MESSAGE = `INSERT INTO Messages(ChatId, Message, MemberId)
                         SELECT $1, $2, MemberId FROM Members
-                        WHERE email=$3;`;
+                        WHERE username=$3;`;
 
 const GET_ALL_CHATS_BY_MEMBERID = `SELECT *
                                    FROM chats
