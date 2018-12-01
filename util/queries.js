@@ -27,7 +27,7 @@ const FIND_UNIQUE_CONTACT = `SELECT DISTINCT  members.memberid, members.firstnam
 
 
 
-const GET_ALL_CONTACTS = `SELECT DISTINCT Members.email, Members.memberid, Members.firstname, Members.lastname, Members.username, Contacts.verified
+const GET_ALL_CONTACTS = `SELECT DISTINCT Contacts.requested_by as requester_id, Members.email, Members.memberid, Members.firstname, Members.lastname, Members.username, Contacts.verified
                           FROM Members
                                  INNER JOIN Contacts
                                    ON (Members.MemberID = Contacts.memberid_a AND Contacts.memberid_b = $1)
