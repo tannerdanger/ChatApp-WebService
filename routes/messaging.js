@@ -119,123 +119,97 @@ router.post("/new", (req, res ) => {
  "recipient_id":the recipient's memberid,
  "recipient_username":"the recipient's username,"
  */
-router.post("/oldnew", (req, res) =>{
-    //TODO: pass in member id
-    //TODO: check if users exist
-    //TODO: check if users are connected
-    //TODO: check if users currently have a connection
+router.post("/newmulti", (req, res) =>{
 
-    let sender_id = req.body[JSONconsts.MYID];
-    let sender_username = req.body[JSONconsts.MYUN];
-    let recipient_id = req.body[JSONconsts.THERID];
-    let recipient_username = req.body[JSONconsts.THEIRUN];
-    var id_a, id_b, name_a, name_b;
+    var chatid = -1;
+    var usrs = req.body['users'];
 
+    var jsonAsArray = Object.keys(usrs).map(function (key){
+        return usrs[key];
+    }).sort(function(itemA, itemB){
+        return itemA.memberid > itemB.memberid;
+    });
 
-    if( sender_id && recipient_id && sender_username && recipient_username ) {
-        console.log("success 1");
-        //sort id's so it is consistent
-        if(sender_id < recipient_id){
-            id_a = sender_id;
-            name_a = sender_username;
-            id_b = recipient_id;
-            name_b = recipient_username;
-        } else {
-            id_a = recipient_id;
-            name_a = recipient_username;
-            id_b = sender_id;
-            name_b = sender_username;
-        }
-        let chatName = name_a + ", " + name_b;
+    var chatname = "";
+    var lst = [];
+    jsonAsArray.forEach(function (element) {
+        chatname += element['username']+", ";
+    });
+
+    chatname = chatname.substring(0, chatname.lastIndexOf(','));
+
+    if(chatname.length > 50){
+        chatname = chatname.substring(0, 50);
+        chatname += "..."
+
+    }
 
 
-        //insert into table chats
-        db.none(queries.CREATE_CHATROOM_NOT_EXISTS, chatName) //create chat
-            .then(() => {
-                console.log("success 2");
-                //get chatid from that chat
-                db.one(queries.GET_CHATID_BY_NAME, chatName) //get chat id
-                //if successful
-                    .then(rows => {
 
-                        chatID = rows[JSONconsts.CHAT];
-                        //insert into table chatmembers
-                        console.log("Success 3, chatID:" +chatID + "|  id_a:"+id_a +"|  id_b:"+id_b) ;
-                        let params = [chatID, id_a];//, chatID, id_b];
-                        //db.none(queries.ADD_MEMBERS_TO_CHATROOM, params)
-                        db.none(queries.ADD_MEMBER_TO_CHAT, params) //add first member to chat
-                        //if successful
-                            .then(() => {
-                                //We successfully created a chat and all tables properly updated
-                                // res.send({
-                                //     success: true,
-                                //     chatid: chatID
-                                // });
+    db.one(queries.CREATE_CHATROOM_NOT_EXISTS, chatname)
+        .then((rows) => {
 
-                            }).catch((err) => {
-                            //log the error
-                            console.log(err);
+            console.log("INSIDE OF CREATE_CHATROOM_NOT_EXISTS");
+            console.log("rows: ", rows);
+            chatid = rows["chatid"];
+            console.log("TESTING CHATID WITHOUT OTHER CALL: ", chatid);
 
-                            res.send({
-                                success: false,
-                                error: err
-                            });
-                        });
-                        params = [chatID, id_b];
-                        db.none(queries.ADD_MEMBER_TO_CHAT, params)
-                        //if successful
-                            .then(() => {
-                                // We successfully created a chat and all tables properly updated
-                                res.send({
-                                    success: true,
-                                    chatid: chatID
-                                });
+            jsonAsArray.forEach(function (element) {
+                lst.push(element['memberid']);
+            });
+            console.log('============LIST============')
+            console.log(lst);
 
-                            }).catch((err) => {
-                            //log the error
-                            console.log(err);
 
-                            res.send({
-                                chatid: chatid,
-                                success: false,
-                                error: err
-                            });
-                        });
 
-                    }).catch((err) => {
-                    //log the error
-                    console.log(err);
-                    res.send({
-                        success: false,
-                        error: err
-                    });
+            db.tx(t => {
+
+                const chatqueries = lst.map(l => {
+                    console.log(l);
+
+                    var qry = `INSERT INTO chatmembers(chatid, memberid) VALUES(`+chatid+`, ${l});`;
+                    console.log(qry)
+                    return t.none(qry, l);
                 });
-
-
-            }).catch((err) => {
-            console.log("error at 1");
-            db.one(`SELECT chatid FROM chats WHERE name = $1`, chatName)
-                .then((data) => {
-                    res.send({
-                        exists:true,
-                        chatid: data
-                    })
-                }).catch((err) => {
-                console.log("error at 2");
+                return t.batch(chatqueries);
+            }).then(data =>{
                 res.send({
-                    success: false,
-                    chatid: chats,
-                    error: err
+                    success:true,
+                    data: data
+                })
+            }).catch(error =>{
+                console.log(error);
+                res.send({
+                    success:true,
+                    error: error
                 })
             });
-        });
-    } else {
-        res.send({
-            success: false,
-            input: req.body,
-            error: "Missing required user information"
-        });
-    }
+
+
+            // db.tx('add chatmembers', t => {
+            //
+            //
+            //     const theQueries = lst.map(l => {
+            //         q = `INSERT into chatmembers(chatid, memberid) SELECT $1, $2 WHERE not exists(SELECT 1 from chatmembers where chatid = ${chatid} and memberid = `;
+            //         console.log(q);
+            //         return t.none(`INSERT into chatmembers(chatid, memberid) VALUES(${chatid}, ${memberid});`, l);
+            //     });
+            //     return t.batch(theQueries);
+            //
+            // }).then(data => {
+            //     res.send({
+            //         success:true,
+            //         data: data
+            //     })
+            // }).catch(error =>{
+            //     res.send({
+            //         success:false,
+            //         error:error
+            //     })
+            // });
+        }).catch(error =>{
+        console.log("error creating chatroom | ERROR: ", error)
+    });
 });
 
 router.post("/remove", (req, res) =>{
@@ -245,17 +219,17 @@ router.post("/remove", (req, res) =>{
     let memberid_a = req.body[JSONconsts.MYID];
     let memberid_b = req.body[JSONconsts.THERID];
 
-     db.task('remove chat', t => {
-         return t.batch([
-             t.any(queries.REMOVE_CHATMEMBERS_BY_CHATID, chatid),
-             t.any(queries.REMOVE_CHATS_BY_CHATID, chatid),
-             t.any(queries.REMOVE_CONNECTION, memberid_a, memberid_b)
-         ]);
-     }).then(data => {
-         res.send(data)
-     }).catch(err => {
-         res.send(err)
-     });
+    db.task('remove chat', t => {
+        return t.batch([
+            t.any(queries.REMOVE_CHATMEMBERS_BY_CHATID, chatid),
+            t.any(queries.REMOVE_CHATS_BY_CHATID, chatid),
+            t.any(queries.REMOVE_CONNECTION, memberid_a, memberid_b)
+        ]);
+    }).then(data => {
+        res.send(data)
+    }).catch(err => {
+        res.send(err)
+    });
 });
 
 
