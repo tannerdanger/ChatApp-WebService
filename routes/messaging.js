@@ -240,10 +240,10 @@ router.post("/send", (req, res) => {
     let message = req.body[JSONconsts.MSG];
     let chatId = req.body[JSONconsts.CHAT];
 
-    if(null != username){email = username;}
+    if(null == username){username = email;}
 
 
-    if(!email || !message || !chatId) {
+    if(!username || !message || !chatId) {
         res.send({
             success: false,
             error: "Username, message, or chatId not supplied"
@@ -252,13 +252,13 @@ router.post("/send", (req, res) => {
     }
     //add the message to the database
 
-    db.none(queries.INSERT_MESSAGE, [chatId, message, email])
+    db.none(queries.INSERT_MESSAGE, [chatId, message, username])
         .then(() => {
             //send a notification of this message to ALL members with registered tokens
             db.manyOrNone(queries.GET_ALL_TOKENS_IN_A_CHAT, chatId)
                 .then(rows => {
                     rows.forEach(element => {
-                        fcm_functions.sendToIndividual(element[JSONconsts.TOKEN], message, email, chatId);
+                        fcm_functions.sendToIndividual(element[JSONconsts.TOKEN], message, username, chatId);
                     });
                     res.send({
                         success: true

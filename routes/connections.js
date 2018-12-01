@@ -152,7 +152,7 @@ router.post("/remove", (req, res) => {
 
             t.any(queries.REMOVE_CHATMEMBERS_BY_CHATID, chatid),
             t.any(queries.REMOVE_CHATS_BY_CHATID, chatid),
-            t.any(queries.REMOVE_CONNECTION, )
+            //t.any(queries.REMOVE_CONNECTION, )TODO:
         ]);
     }).then(data => {
         res.send(data)
