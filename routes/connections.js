@@ -162,12 +162,16 @@ router.post("/propose", (req, res) => {
  */
 router.post("/remove", (req, res) => {
 
+    var sender = req.body[JSONconsts.MYID];
+    var target = req.body[JSONconsts.THERID];
+    var chatid = req.body[JSONconsts.CHAT]
+
     db.task('remove chat', t => {
         return t.batch([
 
             t.any(queries.REMOVE_CHATMEMBERS_BY_CHATID, chatid),
             t.any(queries.REMOVE_CHATS_BY_CHATID, chatid),
-            //t.any(queries.REMOVE_CONNECTION, )TODO:
+            t.any(queries.REMOVE_CONNECTION, [sender, target])
         ]);
     }).then(data => {
         res.send(data)
