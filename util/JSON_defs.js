@@ -14,10 +14,12 @@ const LAT = 'lat';
 const LON = 'lon';
 const KEY = 'key';
 const CODE = 'code';
+const CITY = 'city';
+const ZIPCODE = 'zip';
 
 const USERDATA = 'userdata';
 
-JSON_CONSTS = {MYID, THERID, QUERY, EMAIL, TOKEN, PASSWORD, SALT, MSG, CHAT, MYUN, THEIRUN, SALTKEY, LAT, LON, KEY, CODE};
+JSON_CONSTS = {MYID, THERID, QUERY, EMAIL, TOKEN, PASSWORD, SALT, MSG, CHAT, MYUN, THEIRUN, SALTKEY, LAT, LON, KEY, CODE, CITY, ZIPCODE};
 
 module.exports = {
     JSON_CONSTS

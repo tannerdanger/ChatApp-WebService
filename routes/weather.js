@@ -27,7 +27,7 @@ router.post("/current", (req, res) => {
     let lat = req.body[JSONconsts.LAT];
      let lon = req.body[JSONconsts.LON];
      //base values in case lat/lon is empty
-     if(!lat || !lon) {
+     if(!lat || !lon || (lat === -1)) {
         lat = 47.2098;
         lon = -122.4090;
     }
@@ -44,19 +44,33 @@ router.post("/current", (req, res) => {
     });
 });
 
-//add a get route to the router.
-router.post("/day", (req, res) => {
+
+router.post("/city", (req, res) => {
 
     console.log(req.body);
-    let lat = req.body[JSONconsts.LAT];
-    let lon = req.body[JSONconsts.LON];
+    let city = req.body[JSONconsts.CITY]
     //base values in case lat/lon is empty
-    if(!lat || !lon) {
-        lat = 47.2098;
-        lon = -122.4090;
-    }
 
-    let url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${lat}&lon=${lon}&days=1&key=${API_KEY}`
+    let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&key=${API_KEY}`;
+
+    console.log(url);
+
+    request(url, function(error, response, body) {
+        if(error){
+            res.send(error);
+        } else {
+            res.send(body);
+        }
+    });
+});
+
+router.post("/zip", (req, res) => {
+
+    console.log(req.body);
+    let zip = req.body[JSONconsts.ZIPCODE]
+    //base values in case lat/lon is empty
+
+    let url = `https://api.weatherbit.io/v2.0/forecast/daily?postal_code=${zip}&key=${API_KEY}`;
 
     console.log(url);
 
@@ -70,7 +84,7 @@ router.post("/day", (req, res) => {
 });
 
 
-router.post("/tenday", (req, res) => {
+router.post("/coords", (req, res) => {
     console.log(req.body);
     let lat = req.body[JSONconsts.LAT];
     let lon = req.body[JSONconsts.LON];
