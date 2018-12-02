@@ -96,7 +96,7 @@ const GET_FB_TOKEN_BY_ID = `SELECT token FROM fcm_token WHERE memberid = $1;`;
 
 const GET_USERDATA_BY_EMAIL = 'SELECT memberid, firstname, lastname, username, email, verification FROM Members WHERE Email=$1';
 
-const UPDATE_PASSWORD = `UPDATE members SET password = $1, salt = $2 WHERE memberid = $3;`;
+const UPDATE_PASSWORD = `UPDATE members SET password = $1, salt = $2 WHERE email = $3;`;
 
 MISC_QUERIES = {VERIFY_USER_ACCOUNT, INSERT_NEW_MEMBER, GET_FB_TOKEN_BY_USERNAME, GET_FB_TOKEN_BY_USERNAME, GET_USERDATA_BY_EMAIL, GET_FB_TOKEN_BY_ID, UPDATE_PASSWORD};
 

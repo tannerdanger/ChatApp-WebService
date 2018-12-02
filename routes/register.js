@@ -53,10 +53,11 @@ router.post('/recover', (req, res) => {
 
 router.post('/updatepw', (req, res) =>{
 
-    var id = req.body[JSONconsts.MYID];
+   // var id = req.body[JSONconsts.MYID];
     var email = req.body[JSONconsts.EMAIL];
     var incode = req.body[JSONconsts.CODE];
     var pw = req.body[JSONconsts.PASSWORD];
+
 
     var day = new Date();
     var decoder = day.getDay() + 3;
@@ -76,7 +77,7 @@ router.post('/updatepw', (req, res) =>{
         let salt = crypto.randomBytes(32).toString("hex");
         let salted_hash = getHash(pw, salt);
 
-        params = [ salted_hash, salt, id];
+        params = [ salted_hash, salt, email];
         db.none(queries.UPDATE_PASSWORD, params)
             .then(() =>{
                 db.one('SELECT MemberID, Password, firstname, lastname, username, verification, Salt FROM Members WHERE Email=$1', [email])
