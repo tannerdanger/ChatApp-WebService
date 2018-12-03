@@ -32,9 +32,12 @@ router.post("/search", (req, res) => {
     var memberid = req.body[JSONconsts.MYID];
     let searchquery = req.query[JSONconsts.QUERY];
 
+    console.log(memberid);
+    console.log(searchquery);
     //first, search for unique
     db.one(queries.FIND_UNIQUE_CONTACT, [memberid, searchquery])
         .then((data) => {
+            console.log(data)
 
             res.send({
                 success: true,
@@ -43,19 +46,29 @@ router.post("/search", (req, res) => {
 
         }).catch((err) => {
         //match not found
-        searchquery = "%" + searchquery + "%";
-        db.manyOrNone(queries.FIND_CONTACT_BYREST, [memberid, searchquery])
-            .then((data) => {
-                res.send({
-                    success: true,
-                    user: data
-                });
-            }).catch((err) => {
+        //searchquery = "%" + searchquery + "%";
+
+        if (searchquery.toString().length < 4) {
             res.send({
                 success:false,
-                msg: "no user found"
+                msg:"Search Query Too Short"
             });
-        });
+        }else {
+
+            console.log(searchquery);
+            db.many(queries.FIND_CONTACT_BYREST, [memberid, searchquery])
+                .then((data) => {
+                    res.send({
+                        success: true,
+                        user: data
+                    });
+                }).catch((err) => {
+                res.send({
+                    success: false,
+                    msg: "no user found"
+                });
+            });
+        }
     });
 });
 // db.one(queries.FIND_UNIQUE_CONTACT, [memberid, searchquery])
