@@ -33,7 +33,7 @@ const FIND_UNIQUE_CONTACT = `SELECT DISTINCT memberid, firstname, lastname, user
 const FIND_CONTACT_BYREST = `SELECT DISTINCT memberid, firstname, lastname, username, email
                                    FROM members
                                     WHERE memberid != $1
-                                        AND (email ~* $2 OR username ~* $2 OR firstname ~* $2 OR lastname ~* $2);`;
+                                        AND (username ~* $2 OR firstname ~* $2 OR lastname ~* $2);`;
 
 
 
