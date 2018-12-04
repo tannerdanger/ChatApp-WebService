@@ -212,18 +212,19 @@ router.post("/newmulti", (req, res) =>{
     });
 });
 
+
 router.post("/remove", (req, res) =>{
 
 
     let chatid = req.body[JSONconsts.CHAT];
-    let memberid_a = req.body[JSONconsts.MYID];
-    let memberid_b = req.body[JSONconsts.THERID];
+  //  let memberid_a = req.body[JSONconsts.MYID];
+//    let memberid_b = req.body[JSONconsts.THERID];
 
     db.task('remove chat', t => {
         return t.batch([
             t.any(queries.REMOVE_CHATMEMBERS_BY_CHATID, chatid),
             t.any(queries.REMOVE_CHATS_BY_CHATID, chatid),
-            t.any(queries.REMOVE_CONNECTION, memberid_a, memberid_b)
+            // t.any(queries.REMOVE_CONNECTION, memberid_a, memberid_b)
         ]);
     }).then(data => {
         res.send(data)
