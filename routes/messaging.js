@@ -227,9 +227,9 @@ router.post("/remove", (req, res) =>{
             // t.any(queries.REMOVE_CONNECTION, memberid_a, memberid_b)
         ]);
     }).then(data => {
-        res.send(data)
+        res.send({"data":data, success:true})
     }).catch(err => {
-        res.send(err)
+        res.send({"error":err, success:false})
     });
 });
 
