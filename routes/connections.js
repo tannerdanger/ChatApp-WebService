@@ -37,7 +37,7 @@ router.post("/search", (req, res) => {
     //first, search for unique
     db.one(queries.FIND_UNIQUE_CONTACT, [memberid, searchquery])
         .then((data) => {
-            console.log(data)
+            console.log("Found unique user:\n", data);
 
             res.send({
                 success: true,
