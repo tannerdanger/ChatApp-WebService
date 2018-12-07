@@ -1,5 +1,5 @@
 /**
- * Tanner Brown
+ * @Author Tanner Brown
  * @type {router}
  * Router for handling user registration.
  */
@@ -30,7 +30,13 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
 
-//TODO: FOr user verification, make sure the user being verirified exists.
+/**
+ * Allows a user to recover their password.
+ * It sends a recovery code to an email address, and allows that code to be used
+ * at the /updatepw endpoint to change the password.
+ *
+ * Requires: an email address.
+ */
 router.post('/recover', (req, res) => {
 
     var email = req.body[JSONconsts.EMAIL];
@@ -51,9 +57,14 @@ router.post('/recover', (req, res) => {
         res.send({msg:"email failed to send"});
 });
 
+/**
+ * Uses the unique code sent via email to identify a user, and allow them
+ * to change their password.
+ *
+ * Returns the user's login info.
+ */
 router.post('/updatepw', (req, res) =>{
 
-   // var id = req.body[JSONconsts.MYID];
     var email = req.body[JSONconsts.EMAIL];
     var incode = req.body[JSONconsts.CODE];
     var pw = req.body[JSONconsts.PASSWORD];
@@ -110,8 +121,6 @@ router.post('/updatepw', (req, res) =>{
         })
 
 
-
-
     }else{
         res.send({
             success: false,
@@ -122,6 +131,10 @@ router.post('/updatepw', (req, res) =>{
 
 });
 
+/**
+ * Used to verify a user's account. This endpoint should be called directly from a user's email,
+ * and not within the app code.
+ */
 router.get('/verify', (req, res) => {
     let email = req.query[JSONconsts.EMAIL];
     let key = req.query[JSONconsts.KEY];
@@ -151,6 +164,9 @@ router.get('/verify', (req, res) => {
     }
 });
 
+/**
+ * Resends a verification email to a user.
+ */
 router.post('/resend', (req, res) => {
     var email = req.body[JSONconsts.EMAIL];
 
@@ -158,6 +174,9 @@ router.post('/resend', (req, res) => {
 
 });
 
+/**
+ * Endpoint for registering new users.
+ */
 router.post('/', (req, res) => {
     res.type("application/json");
 
@@ -207,10 +226,3 @@ router.post('/', (req, res) => {
 });
 
 module.exports = router;
-
-/*  OLD QUERIES:
-
-let query = "UPDATE members SET verification = 1 WHERE email =$1";
-let query = 'INSERT INTO MEMBERS(FirstName, LastName, Username, Email, Password, Salt) VALUES ($1, $2, $3, $4, $5, $6)';
-
- */

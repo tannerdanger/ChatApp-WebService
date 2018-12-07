@@ -1,5 +1,5 @@
 /**
- * Tanner Brown
+ * @Author Tanner Brown
  * @type {router}
  * Router for handling user messaging.
  */
@@ -21,11 +21,23 @@ let fcm_functions = require('../util/utils').fcm_functions;
 let queries = require('../util/queries').ALL_QUERIES;
 let JSONconsts = require('../util/JSON_defs').JSON_CONSTS;
 
+/**
+ * Crates a new chatroom between two users.
+ * Requres: both users usernames, aand bother user's memberid's.
+ *
+ * First sorts the users by memberid, so they can be stored in the DB
+ * in sorted order and more easily retrieved. Then creates a chatroom
+ * from a list of all of the names of the users in the Chatroom.
+ *
+ * Returns the chatid of the new chatroom.
+ */
 router.post("/new", (req, res ) => {
+
     let sender_id = req.body[JSONconsts.MYID];
     let sender_username = req.body[JSONconsts.MYUN];
     let recipient_id = req.body[JSONconsts.THERID];
     let recipient_username = req.body[JSONconsts.THEIRUN];
+
     var id_a, id_b, name_a, name_b;
 
     if( sender_id && recipient_id && sender_username && recipient_username ) {
@@ -42,7 +54,7 @@ router.post("/new", (req, res ) => {
             id_b = sender_id;
             name_b = sender_username;
         }
-        var loc = "location 1";
+        var loc = "location 1"; //Location tags for debugging.
         let chatName = name_a + ", " + name_b;
         db.one(queries.CREATE_CHATROOM_NOT_EXISTS, chatName) //create chat
             .then((rows) => {
@@ -51,10 +63,7 @@ router.post("/new", (req, res ) => {
                     .then((data) => {
                         loc = "location 2";
                         console.log(loc);
-                        // res.send({
-                        //     loc: "location 1",
-                        //     data: data['chatid']
-                        // })
+
                         let params = [data['chatid'], id_a];
                         db.oneOrNone(queries.ADD_MEMBER_TO_CHAT, params)
                             .then((data) => {
@@ -90,10 +99,6 @@ router.post("/new", (req, res ) => {
                         data: err
                     })
                 });
-                // res.send({
-                //     loc: "location 1",
-                //     data: rows
-                // })
             }).catch((err) =>{ //chat exists, return chatid
             loc = loc + " catch";
             console.log(loc);
@@ -111,13 +116,10 @@ router.post("/new", (req, res ) => {
 });
 
 /**
- * Tested working 9/nov
- *  requires params:
+ *  Accepts an array of users to be added into a new group chat.
  *
- "sender_id": the sender's memberid,
- "sender_username":"the senders username",
- "recipient_id":the recipient's memberid,
- "recipient_username":"the recipient's username,"
+ *  Sorts the users first, then adds them the same way 2 person chatrooms
+ *  are made in /new
  */
 router.post("/newmulti", (req, res) =>{
 
@@ -138,12 +140,12 @@ router.post("/newmulti", (req, res) =>{
 
     chatname = chatname.substring(0, chatname.lastIndexOf(','));
 
+    //Limit chatroom name length and append "..."
     if(chatname.length > 50){
         chatname = chatname.substring(0, 50);
         chatname += "..."
 
     }
-
 
 
     db.one(queries.CREATE_CHATROOM_NOT_EXISTS, chatname)
@@ -161,7 +163,7 @@ router.post("/newmulti", (req, res) =>{
             console.log(lst);
 
 
-
+            // Transaction makes multiple calls before returning.
             db.tx(t => {
 
                 const chatqueries = lst.map(l => {
@@ -184,41 +186,18 @@ router.post("/newmulti", (req, res) =>{
                     error: error
                 })
             });
-
-
-            // db.tx('add chatmembers', t => {
-            //
-            //
-            //     const theQueries = lst.map(l => {
-            //         q = `INSERT into chatmembers(chatid, memberid) SELECT $1, $2 WHERE not exists(SELECT 1 from chatmembers where chatid = ${chatid} and memberid = `;
-            //         console.log(q);
-            //         return t.none(`INSERT into chatmembers(chatid, memberid) VALUES(${chatid}, ${memberid});`, l);
-            //     });
-            //     return t.batch(theQueries);
-            //
-            // }).then(data => {
-            //     res.send({
-            //         success:true,
-            //         data: data
-            //     })
-            // }).catch(error =>{
-            //     res.send({
-            //         success:false,
-            //         error:error
-            //     })
-            // });
         }).catch(error =>{
         console.log("error creating chatroom | ERROR: ", error)
     });
 });
 
-
+/**
+ * Removes a chatroom from the database.
+ */
 router.post("/remove", (req, res) =>{
 
 
     let chatid = req.body[JSONconsts.CHAT];
-  //  let memberid_a = req.body[JSONconsts.MYID];
-//    let memberid_b = req.body[JSONconsts.THERID];
 
     db.task('remove chat', t => {
         return t.batch([
@@ -234,7 +213,11 @@ router.post("/remove", (req, res) =>{
 });
 
 
-//send a message to all users "in" the chat session with chatId
+/**
+ * Sends a message to all users in a chatid.
+ *
+ * Requres sender's username, chatID and the message.
+ */
 router.post("/send", (req, res) => {
     var username = req.body[JSONconsts.MYUN];
     var message = req.body[JSONconsts.MSG];
@@ -282,7 +265,11 @@ router.post("/send", (req, res) => {
     });
 });
 
-
+/**
+ * Returns all chatrooms a user belongs to.
+ * Used for displaying open chats in the chat screen.
+ *
+ */
 router.post("/getmy", (req, res) => {
     let memberid = req.body[JSONconsts.MYID];
     db.manyOrNone(queries.GET_ALL_CHATS_BY_MEMBERID, memberid)
@@ -298,7 +285,11 @@ router.post("/getmy", (req, res) => {
     });
 });
 
-//Get all of the messages from a chat session with id chatid
+/**
+ * Used to get all messages within a chat.
+ *
+ * Requires: chatid
+ */
 router.post("/getall", (req, res) => {
     let chatId = req.body[JSONconsts.CHAT];
 
@@ -318,25 +309,3 @@ router.post("/getall", (req, res) => {
 
 
 module.exports = router;
-
-
-/**
- OLD QUERIES FOR SAVING
-
- insert = `INSERT INTO Messages(ChatId, Message, MemberId)
- SELECT $1, $2, MemberId FROM Members
- WHERE email=$3`;
-
- insertchats = `INSERT into chats(name) VALUES($1)`;
- insertchatmembers = `INSERT into chatmembers(chatid, memberid) VALUES($1, $2),($3, $4)`;
- selectchatID = `SELECT chatid FROM chats WHERE name =$1`;
- retrieveUser = `SELECT * from members where memberid = $1`;
-
- //getall
- query = `SELECT Members.Email, Messages.Message, Members.memberid,
- to_char(Messages.Timestamp AT TIME ZONE 'PDT', 'YYYY-MM-DD HH24:MI:SS.US' ) AS Timestamp
- FROM Messages
- INNER JOIN Members ON Messages.MemberId=Members.MemberId
- WHERE ChatId=$1
- ORDER BY Timestamp DESC`;
- */

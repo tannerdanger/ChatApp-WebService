@@ -1,5 +1,5 @@
 /**
- * Tanner Brown
+ * @Author Tanner Brown
  * @type {router}
  * Router for handling user to login.
  */
@@ -19,6 +19,9 @@ const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
 
+/**
+ * Logs in user with firebase token.
+ */
 router.post('/withtoken', (req, res) => {
     let email = req.body[JSONconsts.EMAIL];
     let token = req.body[JSONconsts.TOKEN];
@@ -91,7 +94,9 @@ router.post('/withtoken', (req, res) => {
     }
 });
 
-
+/**
+ * Logs in user without firebase token. Should be depreciated.
+ */
 router.post('/', (req, res) => {
     let email = req.body[JSONconsts.EMAIL];
     let theirPw = req.body[JSONconsts.PASSWORD];
@@ -142,8 +147,3 @@ router.post('/', (req, res) => {
 });
 
 module.exports = router;
-
-/*  old queries
-'SELECT memberid, firstname, lastname, username, email, verification FROM Members WHERE Email=$1'
-
- */

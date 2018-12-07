@@ -3,9 +3,7 @@ const express = require('express');
 //Create a new instance of express
 const app = express();
 
-// const bodyParser = require("body-parser");
-// //This allows parsing of the body of POST requests, that are encoded in JSON
-// app.use(bodyParser.json());
+
 
 
 // app.use('/params', require('./routes/params.js'));
@@ -25,10 +23,10 @@ app.use('/register', require('./routes/register.js'));
 app.get("/", (req, res) => {
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write('<h' + 1 + ' style="color:blue">APP IS ONLINE</h' + 1 + '>');
-    for (i = 1; i < 7; i++) {
-        //write a response to the client
-        res.write('<h' + i + ' style="color:blue">Hello World!</h' + i + '>'); 
-    }
+    // for (i = 1; i < 7; i++) {
+    //     //write a response to the client
+    //     res.write('<h' + i + ' style="color:blue">Hello World!</h' + i + '>');
+    // }
     res.end(); //end the response
 });
 //

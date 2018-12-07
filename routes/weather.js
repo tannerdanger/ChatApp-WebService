@@ -1,5 +1,5 @@
 /**
- * Tanner Brown
+ * @Author Tanner Brown
  * @type {router}
  * Router for handling weather forecast retrieval.
  */
@@ -21,7 +21,9 @@ const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
 router.use(bodyParser.json());
 
-//add a post route to the router.
+/**
+ * Returns the current weather based on lat/long.
+ */
 router.post("/current", (req, res) => {
     console.log(req.body);
     let lat = req.body[JSONconsts.LAT];
@@ -44,7 +46,9 @@ router.post("/current", (req, res) => {
     });
 });
 
-
+/**
+ * Returns 10-day weather for a specific city.
+ */
 router.post("/city", (req, res) => {
 
     console.log(req.body);
@@ -64,6 +68,9 @@ router.post("/city", (req, res) => {
     });
 });
 
+/**
+ * Returns 10-day weather for a zip code.
+ */
 router.post("/zip", (req, res) => {
 
     console.log(req.body);
@@ -83,7 +90,9 @@ router.post("/zip", (req, res) => {
     });
 });
 
-
+/**
+ * Update lat/long based on coordinates. (depreciated but saved to prevent errors just incase...)
+ */
 router.post("/coords", (req, res) => {
     console.log(req.body);
     let lat = req.body[JSONconsts.LAT];

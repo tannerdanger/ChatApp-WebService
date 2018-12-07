@@ -1,3 +1,10 @@
+/**
+ * @Author Tanner Brown
+ * @type {string}
+ *
+ * Holds constant json var names to prevent misspellings.
+ */
+
 const MYID = 'memberid';
 const THERID = 'their_id';
 const QUERY = 'query';

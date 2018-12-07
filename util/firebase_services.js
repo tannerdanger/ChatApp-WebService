@@ -1,3 +1,4 @@
+
 var admin = require("firebase-admin");
 
 var serviceAccount = require("./tcss450-hoolichat-firebase-adminsdk-datue-35e03d5310");

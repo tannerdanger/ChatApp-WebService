@@ -1,3 +1,10 @@
+/**
+ * @Author Tanner Brown
+ * @type {string}
+ *
+ * Stores DB queries as constants to save codespace and reuse.
+ */
+
 //***************** CONNECTION QUERIES **********//
 const PROPOSE_CONNECTION = `INSERT INTO contacts (memberid_a, memberid_b, requested_by)
                             SELECT $1, $2, $3
@@ -17,14 +24,6 @@ const ACCEPT_CONNECTION = `UPDATE contacts SET verified = 1
                                    AND (memberid_a = $1 AND "memberid_b" = $2)
                               OR (memberid_a = $2 AND memberid_b = $1);`;
 
-// const FIND_UNIQUE_CONTACT = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
-//                              FROM members
-//                                     INNER JOIN contacts
-//                                       ON (Contacts.memberid_a = members.memberid AND Contacts.memberid_b != $1)
-//                                            OR (Contacts.memberid_b = members.memberid AND Contacts.memberid_a != $1)
-//                              WHERE members.memberid != $1
-//                                AND (members.email ILIKE $2 OR members.username ILIKE $2);`;
-
 const FIND_UNIQUE_CONTACT = `SELECT DISTINCT memberid, firstname, lastname, username, email
                                 FROM members
                                     WHERE memberid != $1
@@ -43,12 +42,6 @@ const GET_ALL_CONTACTS = `SELECT DISTINCT Contacts.requested_by as requester_id,
                                    ON (Members.MemberID = Contacts.memberid_a AND Contacts.memberid_b = $1)
                                         OR (Members.MemberID = Contacts.memberid_b AND Contacts.memberid_a = $1);`;
 
-// const FIND_CONTACT_BYREST = `SELECT DISTINCT  members.memberid, members.firstname, members.lastname, members.username, members.email
-//                              FROM members
-//                                     LEFT OUTER JOIN contacts
-//                                       ON (members.memberid IN (Contacts.memberid_b, Contacts.memberid_a) AND $1 NOT IN (contacts.memberid_a, contacts.memberid_b))
-//                                            AND (Contacts.memberid_b != $1 AND Contacts.memberid_a != $1)
-//                              WHERE  members.memberid != $1 AND (members.username ILIKE $2 OR members.firstname ILIKE $2 OR members.lastname ILIKE $2);`;
 
 CONNECTION_QUERIES = {PROPOSE_CONNECTION, ACCEPT_CONNECTION, FIND_UNIQUE_CONTACT, FIND_CONTACT_BYREST, GET_ALL_CONTACTS, REMOVE_CONNECTION};
 
@@ -56,7 +49,7 @@ CONNECTION_QUERIES = {PROPOSE_CONNECTION, ACCEPT_CONNECTION, FIND_UNIQUE_CONTACT
 
 const GET_CHATID_BY_NAME = `SELECT chatid FROM chats WHERE name =$1`;
 
-//const ADD_MEMBERS_TO_CHATROOM = `INSERT into chatmembers(chatid, memberid) VALUES($1, $2),($3, $4)`;
+
 const ADD_MEMBER_TO_CHAT = `INSERT into chatmembers(chatid, memberid) SELECT $1, $2 WHERE not exists(SELECT 1 from chatmembers where chatid = $1 and memberid = $2);`;
 
 const ADD_MEMBERS_TO_CHATROOM = `INSERT into chatmembers(chatid, memberid) SELECT($1, $2),($3, $4) WHERE not exists(select 1 from chatmembers where chatid = $1 and memberid = $2);`;
