@@ -1,3 +1,7 @@
+/*
+    Util file. Holds various necessary helper functions.
+*/
+
 //Get the connection to Heroku Database
 let db = require('./sql_conn.js');
 
@@ -8,7 +12,9 @@ const crypto = require("crypto");
 
 
 
-
+/**
+    Sends an email to a user. Used as a wrapper for sending verification email.
+*/
 function sendEmail(from, receiver, subj, message) {
 
     var transporter = nodemailer.createTransport({
@@ -46,16 +52,19 @@ function sendEmail(from, receiver, subj, message) {
     //fake sending an email for now. Post a message to logs.
 
 }
-
+/**
+    Prepares a verification email to send to a user to veifiy account.
+*/
 function sendVerificationEmail(reciever, key){
     let url="https://tcss450group6-backend.herokuapp.com/register/verify?key="+ key +"&email=" +reciever;
     let message = "<strong>Welcome to our app!</strong> <p>Please follow the link below to verify your account!</p> <p>" + url + "</p>";
     sendEmail("", reciever, "Welcome to Hoolichat! Verification Required!", message);
 }
 
+/**
+    Prepares a recovery email to the user to recover the user's password.
+*/
 function sendRecoveryEmail(reciever, code){
-
-
      let message = "<p>You requested to change your password</p> <p>Please copy the following code into the Hooli Chat app to change your password.</p> <h2><strong>" + code + "</strong></h2>";
      sendEmail("hoolichat.authenticator@gmail.com", reciever, "Password Recovery", message )
 }
